@@ -1,0 +1,22 @@
+# LOCAL ONLY. Copy to .dev.vars (ignored). Production defaults remain disabled.
+APP_ENV="development"
+APP_ENABLED="true"
+APP_SIGNUP_ENABLED="true"
+APP_ANALYTICS_ENABLED="true"
+APP_LEARNING_ENABLED="false"
+APP_PLATFORM_ENABLED="false"
+# Optional shared platform bridge: server-side SERVICE credentials only.
+# PLATFORM_API_ORIGIN="https://api.appneurox.com"
+# PLATFORM_TENANT_ID="<approved-tenant>"
+# PLATFORM_PROJECT_ID="<approved-project>"
+# PLATFORM_ENVIRONMENT_ID="<approved-environment>"
+# PLATFORM_SERVICE_CREDENTIAL="<private-scoped-service-credential>"
+APP_ALLOWED_ORIGINS="http://localhost:8081,http://127.0.0.1:8081,http://localhost:8788,http://127.0.0.1:8788"
+TECHLYUP_ERP_ORG_ID="appneural"
+# Optional Phase1 local preview. Defaults below remain off until explicitly set.
+APP_CRM_ENABLED="false"
+APP_CRM_CAPTURE_ENABLED="false"
+APP_CRM_SENDING_ENABLED="false"
+APP_CRM_INTEGRATIONS_ENABLED="false"
+CRM_ANALYTICS_EXPORT_ENABLED="false"
+# Provider/relay secrets and approvals are operator-only. See docs/crm-provider-protocols.md.

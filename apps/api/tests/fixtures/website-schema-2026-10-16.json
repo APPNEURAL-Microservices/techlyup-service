@@ -1,0 +1,191 @@
+{
+  "commit": "253c77f48fe2d885082cedc10efd75eb1fddfc06",
+  "scope": "Schema-only, no data rows. Original migration hashes for drift review.",
+  "migrations": [
+    {
+      "file": "0001_workshop_registrations.sql",
+      "sha256": "938e30db559375d2a2c9f6c6de66f55c8dbe0873d886375a2b73ebcdbfdf3e75"
+    },
+    {
+      "file": "0002_add_join_url.sql",
+      "sha256": "478158a401a7a63b635fbf97c9d7a037b8e5817b0b5dc5a9169118e5e02deac2"
+    },
+    {
+      "file": "0003_learner_progress.sql",
+      "sha256": "58d6717da0e50ea6884a359e8a214033d94244a3d43d3c86b33dd11fc50a8f7c"
+    },
+    {
+      "file": "0004_certificates.sql",
+      "sha256": "5ea85d0344e24ec262e5e3a89037eee8bb66044ad03ace3892b70882c60cfcb6"
+    },
+    {
+      "file": "0005_payments.sql",
+      "sha256": "4ebeb5157cd1107ead1f3273f344a0ffec9e35073f936469ad4b092505238b43"
+    },
+    {
+      "file": "0006_automations.sql",
+      "sha256": "59aea1790c7ff0a4cbccccd1207312305a65cfdfe39104d334284fd15f45e225"
+    },
+    {
+      "file": "0007_notification_revisions.sql",
+      "sha256": "cbf3687abe6b88cc188f80729de66287df90437ce59230fe13c8d02b91433074"
+    },
+    {
+      "file": "0008_course_access_and_seat_offers.sql",
+      "sha256": "4e6d434e7110df5ad6889799910279f3cb6a11258eb775e5e8e1101fd0c78799"
+    },
+    {
+      "file": "0009_submissions.sql",
+      "sha256": "a5005c08ffb0b27eefd15b72b358f3779f148b52e91d2efb683943962d6427c1"
+    },
+    {
+      "file": "0010_registration_profile_fields.sql",
+      "sha256": "e7b7e1548fdcf294e2e4d7b1c691088a40cc840d04e83e91f63f4b593f244a34"
+    },
+    {
+      "file": "0011_paid_webinars.sql",
+      "sha256": "9ff9ccbb195eb56c1e8566214f7f36ad70ee3fe0b09c5d41a134502b300d825b"
+    },
+    {
+      "file": "0012_webinar_topic_votes.sql",
+      "sha256": "685261981a473ac6923283fe8e46ab5a777b554234c72b117a2bbe45e2e6cdfc"
+    },
+    {
+      "file": "0013_webinar_feedback_submissions.sql",
+      "sha256": "2153b644bd6e443e9effca934b6fb6d67247d97488b21744be67fcc66082246f"
+    },
+    {
+      "file": "0014_webinar_attendance_certificates.sql",
+      "sha256": "bf24642fb3fd12222039270455f9a62fa2f5969d372804315c7d468764652b14"
+    },
+    {
+      "file": "0015_attendance_certificate_claims.sql",
+      "sha256": "06c075c1efedd2900a13b6e6d2ca291ccf7a5abc0d71ae4df0030eef04a65f33"
+    },
+    {
+      "file": "0016_webinar_feedback_na_ratings.sql",
+      "sha256": "2047e544ad9763c080bbfe76cf839a30b7b40e868a106028f5f678d342cb63c4"
+    },
+    {
+      "file": "0017_innovatewithajay_imports.sql",
+      "sha256": "9ceaa5f1b2bbbae8c935810e975cb5d504000cd8104f157341c3fa1cd08bfeb6"
+    },
+    {
+      "file": "0018_imported_webinar_attendance.sql",
+      "sha256": "3af90dda2e87ac961a149efb63746c4bcfa130586ac49fb04fa5e54c361d424e"
+    },
+    {
+      "file": "0019_imported_webinar_certificates.sql",
+      "sha256": "0aa4f8d81439a591b649cc2a9524f583c461bab394457ee7043192e27e692aac"
+    },
+    {
+      "file": "0020_historical_event_certificates.sql",
+      "sha256": "43e44edf9a46625ae925f16fb3317eb5e25739141f32e1b9b6864a529cdf25be"
+    },
+    {
+      "file": "0021_historical_claim_approvals.sql",
+      "sha256": "366e6bcb5e41777f4d567ecd109974da9074ed6741d6e0a0ea4786301b4af8f3"
+    },
+    {
+      "file": "0022_historical_claim_questions.sql",
+      "sha256": "69ec51620b62ec0584cc232148861f798881fb6fa62bec352219d3968a11e672"
+    },
+    {
+      "file": "0023_historical_claim_skip.sql",
+      "sha256": "c916e4b88ffc3f4f538a18dc8f9cbac79b5b78b3236e3cb4ca00860199f60678"
+    },
+    {
+      "file": "0024_historical_claim_submission_kinds.sql",
+      "sha256": "724a9e88d325cc7869595d6ef25ee2a7fa5dd6941aaa80001cc73a06811cc969"
+    },
+    {
+      "file": "0025_learning_catalog.sql",
+      "sha256": "9472b5fffdb1ed296b0b623130e8874e3a1ef9096fbdf80664d088f8f09c3b9d"
+    },
+    {
+      "file": "0026_learner_accounts.sql",
+      "sha256": "52d10dbde5091b57f6c53dcd092a3ce770b86915f6e3dcb59ecef9a811e68c61"
+    },
+    {
+      "file": "0027_registration_middle_name.sql",
+      "sha256": "6783aa85e283f726e40639cd48d44a536a6591d652c1615c3a156bb6c1c2646d"
+    },
+    {
+      "file": "0028_notification_provider.sql",
+      "sha256": "d892133ffbf8615e2bad266b347c9d53a8afbdc1f3e469d0ca88e6fd04141a94"
+    },
+    {
+      "file": "0029_certificate_email_access.sql",
+      "sha256": "e2825964f7799166b01d9ba3376a1b328247091a2f30d61798e5e21396cb5f12"
+    },
+    {
+      "file": "0030_webinar_resources.sql",
+      "sha256": "af9697f4ea3f160644038fa27f0111989adf2d43de1eb63b79277a04431ec088"
+    },
+    {
+      "file": "0031_webinar_erp_operations.sql",
+      "sha256": "6bc380b2a87feec1394e40c21e2f2d42de00002b1c150f294f22bd0474ede32b"
+    },
+    {
+      "file": "0032_webinar_erp_series.sql",
+      "sha256": "2b803af4cfe637f67c3d2c89f51c406c47f97a0986d1b726a985b3ee7c89590e"
+    },
+    {
+      "file": "0033_webinar_erp_contract_integrity.sql",
+      "sha256": "a6dfc125868209b47b3025554e17b9f73e3afe73fa0ab6389048690c2777020b"
+    },
+    {
+      "file": "0034_webinar_learning_and_cases.sql",
+      "sha256": "5365531cc34298650a2b7caefdd52c0a457ecc75b6ade376696e9391a12766d3"
+    },
+    {
+      "file": "0035_native_mentorship_workflow.sql",
+      "sha256": "bc97ed77773aaa15a955e3902a38e42a342ac0a3ec6a4ec11284778748d644c1"
+    },
+    {
+      "file": "0036_webinargg_integration.sql",
+      "sha256": "41044f4f26f3ddfd615c127445df4abdc8c5ece5e9a62c812ed4036629d0ecdf"
+    },
+    {
+      "file": "0037_live_sessions.sql",
+      "sha256": "5656bbd0af67a8ab10cd875e045fec8ac83517e8dc3cc14a6a36a77d1cf9f502"
+    },
+    {
+      "file": "0038_live_attendance.sql",
+      "sha256": "8ce8c526b524de89d854cfbe3f88d53b0f0041cc39ac2d464b379f3ac461f968"
+    },
+    {
+      "file": "0039_live_engagement.sql",
+      "sha256": "d3320ab174c3fbf02f39cc06159033b46d5e2e2d95fd9f99c07bd350e34abf1a"
+    },
+    {
+      "file": "0040_live_provider_webhooks.sql",
+      "sha256": "20c196b64ea0982da66e28d0e63876e8b4d10066247aaa44f2c6b65816e8138e"
+    },
+    {
+      "file": "0041_phase2_live_identity.sql",
+      "sha256": "ff597ed59bda4086fa3691af60e5eabac507b774bde65c1936651cba05ede64f"
+    },
+    {
+      "file": "0042_phase2_live_registration_guards.sql",
+      "sha256": "d12ab394b41e7db508fe464ea19407787197203c433646959de34eda50f869bd"
+    },
+    {
+      "file": "0043_broadcast_registration_capacity.sql",
+      "sha256": "2d16c9e331fe2ff135ba9b7815c9295281f25e006d7d45ba838695590c9739d9"
+    },
+    {
+      "file": "0044_live_communication_privacy.sql",
+      "sha256": "821cb1afb5053617ff787e11d29cf7d52640196ccb2d9d7553cd44e0ae627d9f"
+    },
+    {
+      "file": "0045_live_email_privacy_receipts.sql",
+      "sha256": "6a79731a808d542e5e6b8255a303257c2fb24ed9b5feb522904799630f269b43"
+    },
+    {
+      "file": "0046_account_email_verification.sql",
+      "sha256": "4251199267297c6b7cb4e10b5e0085967c2923f2bb22d6125468595ba2d9d65c"
+    }
+  ],
+  "snapshotSha256": "fec388d106f9b2cad551e60ea1c058845f53c88b67b53e18292ee2d9725b0b01"
+}

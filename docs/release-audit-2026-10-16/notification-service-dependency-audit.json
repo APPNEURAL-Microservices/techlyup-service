@@ -1,0 +1,31 @@
+{
+  "repository": "notification-service",
+  "command": "npm audit --json",
+  "exitCode": 0,
+  "scope": "Stale npm lock snapshot only; does not cover the active pnpm graph",
+  "status": "Partial",
+  "lockfile": "package-lock.json",
+  "lockfileSha256": "8b32a259257f2eac22190cb2f0313405a0357aef15b317ba2ad3afcaf858e137",
+  "manifestDirectDriftCount": 17,
+  "auditReportVersion": 2,
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 207,
+      "dev": 249,
+      "optional": 5,
+      "peer": 1,
+      "peerOptional": 0,
+      "total": 456
+    }
+  },
+  "vulnerabilities": {},
+  "recordedAt": "2026-10-16T04:13:00.941159+00:00"
+}

@@ -1,0 +1,524 @@
+{
+  "recordedAt": "2026-10-16T04:13:20.134214+00:00",
+  "scope": "Current local source and explicit audit harness, excludes dependencies, generated output, credentials and private files",
+  "headCommits": {
+    "techlyup-service": null,
+    "learning-service": "dfabbf61678f630772823f67a05242d06d5ac23f",
+    "notification-service": "3801d812a02cdd6b046c5554fa16e3d011ec2e73",
+    "messaging-service": "b5901bde8c6891d3c44758a22f92f362c061b612"
+  },
+  "uncommitted": "techlyup-service has no initial commit; native owner integrations are modified/untracked",
+  "files": [
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/auth/cookies.ts",
+      "bytes": 1099,
+      "sha256": "c279553aa281893393f44b94138fe0d16f6a15f581bba23c39d9f38eecd48f82"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/auth/crypto.ts",
+      "bytes": 1784,
+      "sha256": "dfb41dd18276550cea30b9da8eaad259f53710970a1ba560cb272b063300b59c"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/auth/permissions.ts",
+      "bytes": 3138,
+      "sha256": "36f69769b9b58484c3165f61155b5ae8fcb1737fe140340c710dab8e11aa8126"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/auth/service.ts",
+      "bytes": 12337,
+      "sha256": "eee74d74979e525e8501aa481d0397c0a6ff43241d6b7046939e05d88baff237"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/config.ts",
+      "bytes": 5085,
+      "sha256": "63bc2dbb40be4ca034efdcf7ac6d899fc8a8f03b91e1b8551fb379f7738b9dd5"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/crm/analytics-export.ts",
+      "bytes": 4130,
+      "sha256": "f5e189bf1e1e483df92064d3b35df029c36a6286eab6c89fd1e4005d61fa73fe"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/crm/automation.ts",
+      "bytes": 6398,
+      "sha256": "864518f741365ac9e4aa68218f6ca657a6f69e431e2704042a128c94c453c96d"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/crm/canonical-source.ts",
+      "bytes": 11724,
+      "sha256": "5156a3d5f91079b6567aee763624712f0b84252ecff19bf6ec703fbd43d6026d"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/crm/http.ts",
+      "bytes": 18847,
+      "sha256": "ae29c9c7bb8fae69d6be9fddcb36b20b6e942e081913c77a2bd9f81517892f1c"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/crm/integrations.ts",
+      "bytes": 2456,
+      "sha256": "eaa03f0d21ab535be5fbe16b27ab6e494df1f0d065a56d967592b3edfa304c12"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/crm/notifications.ts",
+      "bytes": 5659,
+      "sha256": "957a8bd7b6ac003381b4b060731e6b8a8b0ad7fab3e6aa8af228d91fb3efd9fa"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/crm/providers.ts",
+      "bytes": 9508,
+      "sha256": "8aa86908aad4ac7689de52ad8078993d293e25eb3f68f367ce7422fdee046de4"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/crm/repository.ts",
+      "bytes": 54028,
+      "sha256": "9b30a49f5a467e6e637735b3cda7a7182677199ce65179928c82ab87b19e7ab8"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/crm/schema.ts",
+      "bytes": 1324,
+      "sha256": "ba56e2ed7740237909bcbf8ea5c0e5e6e2c806fe1c7ba8edf2c87d50a5f0634d"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/crm/task-due.ts",
+      "bytes": 2437,
+      "sha256": "ae8f210bac5cfdb364d705b353cd5848e8ccc31945623dc6eb276d4f78bd1f9e"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/crm/visitors.ts",
+      "bytes": 7236,
+      "sha256": "b942497ebbf65d98c604a64d8d5ce5baf8de207e793c2813e50f04e144fc9655"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/http.ts",
+      "bytes": 4060,
+      "sha256": "8f4ef9d5b7642b4efae9b13733b364ee72dd3d87269f73dabafc5525d0af0c7e"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/index.ts",
+      "bytes": 11945,
+      "sha256": "538d1a08098bd77214ae34dce75538a374d20c85bb8af450c8883c12a5ff312d"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/learning/http.ts",
+      "bytes": 4593,
+      "sha256": "b82c43fc1f30aedb0bb35c38105b72e0bb7c9d1feb7605c9f4b11f8ed437100c"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/maintenance.ts",
+      "bytes": 1131,
+      "sha256": "91beb467860e502d90822e198a411d70a99a559166e7419b9137da5a657e27dd"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/platform.ts",
+      "bytes": 2383,
+      "sha256": "795d8cd6e5b4b84587377a809e2d7f8a7b6e8e21f928c31443d5dcf27039eed9"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/src/types.ts",
+      "bytes": 1595,
+      "sha256": "ac1bc0dc7b0a69e415d108a811fad9a9fc9505122b423b77422edc8125487121"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/crm-canonical-notifications.test.ts",
+      "bytes": 18476,
+      "sha256": "17ac1420fa5d6fc3e9c2696e409cc571645e0ee0edd3d7b652f9538a558648a3"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/crm-form-attribution.test.ts",
+      "bytes": 2027,
+      "sha256": "77db1ad67bc32c936a8b0cc5579c4a7f1df87c49c48f4084e7ed2a0a20ba25a4"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/crm-http.test.ts",
+      "bytes": 15379,
+      "sha256": "391ca997d887d3818b72b6da67a052b2c2607499b60dbef0c3759cecf06c9b8f"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/crm-privacy-source.test.ts",
+      "bytes": 7787,
+      "sha256": "b6b5bc4558e2c23cec0da428aca06a22e1e72e6b4f956cf1e14a5d8f87093f2b"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/crm-providers.test.ts",
+      "bytes": 6141,
+      "sha256": "8d4eb70f4df0ca522eba43f5929e6f7dc0114411056d0a6a2dc5d75fd6002f6a"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/crm-repository.test.ts",
+      "bytes": 34396,
+      "sha256": "673d7c473c754279ef719a61fd7352e23350068b514469382651cd56a9e0399a"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/crm-runtime.test.ts",
+      "bytes": 14608,
+      "sha256": "0eaa9c2decb8b3f78c23209bf9c39fe42c3dc439ba09ec969495e42a25527993"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/fixture.ts",
+      "bytes": 3775,
+      "sha256": "f062cb86ee11199ae3bdbf840fc5e2ebdb199e19cd98e3ab2089466ed2dcd51a"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/fixtures/canonical-crm.sql",
+      "bytes": 2409,
+      "sha256": "4fc1ee2a8123e72707af96e98da1853f4f4456ba9521aedf1cfe9f7637fdc5dd"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/fixtures/canonical.sql",
+      "bytes": 2038,
+      "sha256": "28cd044251d56099626c810b09c14142f393709155e0b285260f84acf94f3173"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/fixtures/website-schema-2026-10-16.json",
+      "bytes": 6931,
+      "sha256": "03c3c064fd4e91aa4c7912c879062447730f3ed00495bbdc6741794c1f3de7ac"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/fixtures/website-schema-2026-10-16.sql",
+      "bytes": 55894,
+      "sha256": "fec388d106f9b2cad551e60ea1c058845f53c88b67b53e18292ee2d9725b0b01"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/learning-http.test.ts",
+      "bytes": 4495,
+      "sha256": "b05653e6a0b072cc87755911d221f96d8d2ea372dfde74b0cd781cba8ed51ecb"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/learning-runtime.test.ts",
+      "bytes": 14067,
+      "sha256": "030d531609d7849e367d15fad86d7c6fd3daf9bfb79a4cb17ca04bf20340647b"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/maintenance.test.ts",
+      "bytes": 1854,
+      "sha256": "32a4850d8923928a0e1e5e1ae8d9267ca60f6a832f70770d2bab2a7f2fe5d989"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/platform.test.ts",
+      "bytes": 1798,
+      "sha256": "2ef1441dabd60e4c8ced78e76dd6ecf562380543158c895cb32602dbed9223b1"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/tests/security.test.ts",
+      "bytes": 14408,
+      "sha256": "5ee95daddf274972f1e83b12234eef69259771efeb8f20fd37321e355935a285"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "migrations/d1/0047_native_app_foundation.sql",
+      "bytes": 2466,
+      "sha256": "0682b383ada7bfd91fe9e5f3eb1d07b42ca7e683c1e72fb8b89f884fce149d98"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "migrations/d1/0048_crm_acquisition.sql",
+      "bytes": 13343,
+      "sha256": "5977484f8c602f53105ec8b12d3c5ffbd85a156150324288244720c06a15f872"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "migrations/d1/0049_crm_canonical_sources.sql",
+      "bytes": 5302,
+      "sha256": "e7bcee490b2b88479c834967c27e2c9acca14efc23684b03ca895709ca6f006b"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "migrations/d1/0050_crm_visitors.sql",
+      "bytes": 1315,
+      "sha256": "273e2e845d185e5dd34bc9bd06fc9c8b2e23ad7e0568bdba33fcc209ba0ea0e9"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "migrations/d1/0051_crm_staff_alerts.sql",
+      "bytes": 577,
+      "sha256": "5ff8b5ca5e0d09c9c0622f9715351a71b61cfe29e904ea4ce2e552e6313e34df"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "packages/contracts/src/catalog.ts",
+      "bytes": 11341,
+      "sha256": "bb2f923164e7b4d97ed45cea95743e83a34de760f353fc0bcc353b07b1e3218a"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "packages/contracts/src/crm.ts",
+      "bytes": 9950,
+      "sha256": "6d99cb151736931eabab6bed1d2a053e4c3ff3ccfb72481a083eb4b5428db5e9"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "packages/contracts/src/index.ts",
+      "bytes": 4023,
+      "sha256": "490ade21d3b7aa4efedf2561f1e6e092c49149dbfcdcc1089e5299cbeb9b0f7b"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "packages/contracts/src/lessons.ts",
+      "bytes": 9750,
+      "sha256": "08453691c5985470eb8375f04b008cee2fc4596bd9e5105c6d9787b4fc998b55"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "packages/contracts/src/taxonomy.ts",
+      "bytes": 9020,
+      "sha256": "94a9360011c5ff35928265805b2e51ea5caaa9593bef998a61691fd97b3e85b1"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "packages/platform-client/src/index.ts",
+      "bytes": 7933,
+      "sha256": "f4aecd444abe54173644ba3a89525a35cad96d669e6f1eeff2e7d596cb2d1093"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "scripts/snapshot-public-catalog.mjs",
+      "bytes": 2465,
+      "sha256": "c2010041b820506be70af9597c19b9a9e988844c3ecd7d342bb4e2b214e64c59"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "scripts/test-native-bridge.mjs",
+      "bytes": 1511,
+      "sha256": "7c37d57be4df0b38c10b2785772117c5098dd8cdd0d69e00761a532f0dda3552"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "package.json",
+      "bytes": 800,
+      "sha256": "9aeaa615aa1256618fde2e2ee80d9893b9dd0408e62efd8e22511491d9cdd0db"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "package-lock.json",
+      "bytes": 59600,
+      "sha256": "6e9e93edf07e964844aa7382798791a918ba813ee8d2238fd267dfa4a7cd6315"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/wrangler.jsonc",
+      "bytes": 1304,
+      "sha256": "4b41e533f77e2b898033217d0ae031b91da6a771b3ffa432dbc53499a4ddd333"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "apps/api/wrangler.ci.jsonc",
+      "bytes": 867,
+      "sha256": "8ccb56e7d7b4ec4385ecc6852d1d59e1dc019d08623b028b0c0d04387060ef07"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": ".github/workflows/validate.yml",
+      "bytes": 2711,
+      "sha256": "09a60916567bb9af01dc131ab67d388d4236fb50e3a37670968b266d1ef2419f"
+    },
+    {
+      "repository": "learning-service",
+      "path": "packages/learning-postgres/migrations/0001_learning_foundation.sql",
+      "bytes": 7003,
+      "sha256": "b1e57967ec70bdc74027c224c21b215954985c4f2fbaa52f8e84fdef1396367c"
+    },
+    {
+      "repository": "learning-service",
+      "path": "packages/learning-postgres/package.json",
+      "bytes": 792,
+      "sha256": "69e623f8150fb4309cb4cee863749cb8d264d53697ec7d7519c18785ceea2574"
+    },
+    {
+      "repository": "learning-service",
+      "path": "packages/learning-postgres/scripts/lib/migrations.mjs",
+      "bytes": 5250,
+      "sha256": "3b37feb24ae20fedfaffb84fb0c737db10902c59500c2bac34f5dac722d82465"
+    },
+    {
+      "repository": "learning-service",
+      "path": "packages/learning-postgres/scripts/migrate.mjs",
+      "bytes": 1382,
+      "sha256": "3044872eedf8b733ba3a1a607095bb01976a90bf8572014bee219887868519ee"
+    },
+    {
+      "repository": "learning-service",
+      "path": "packages/learning-postgres/scripts/runtime-grants.sql",
+      "bytes": 1164,
+      "sha256": "8f4cecdf2ca86e9168ce7fb3187b16964c529354fb880721a357b648ac517f34"
+    },
+    {
+      "repository": "learning-service",
+      "path": "packages/learning-postgres/src/index.ts",
+      "bytes": 11238,
+      "sha256": "ea6af29e3dfa1982a826fcd6085686f3f3a6344208fd7ad36a83e7d7c4076248"
+    },
+    {
+      "repository": "learning-service",
+      "path": "packages/learning-postgres/tests/database.test.ts",
+      "bytes": 16616,
+      "sha256": "66a960c7b024ae478e93ff4f261f8402fcef3384ac3af87a0b573894ab733479"
+    },
+    {
+      "repository": "learning-service",
+      "path": "packages/learning-postgres/tsconfig.json",
+      "bytes": 183,
+      "sha256": "9f9d86573c55a83db00c06dc3fc13669769ee0342f22b52f53c33f4e22196221"
+    },
+    {
+      "repository": "notification-service",
+      "path": "src/orchestration/service.ts",
+      "bytes": 130919,
+      "sha256": "4b67ff8c1916ca93855a7cd7deafc1aea540f2e2a0d6adba40151aebc9a60c6c"
+    },
+    {
+      "repository": "notification-service",
+      "path": "src/orchestration/delivery-source.ts",
+      "bytes": 2039,
+      "sha256": "ee5ac805d831e6043cff1d7d9b2ddad30a5710cb2a8e4373ba2a0753ee3fff87"
+    },
+    {
+      "repository": "notification-service",
+      "path": "test/unit/delivery-source.test.cjs",
+      "bytes": 3052,
+      "sha256": "b6c1d1ba11317f180d74aa577a3bfe2a88afd9e06de332852843c39f7aa1be4d"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "src/transport/delivery-authority.ts",
+      "bytes": 7774,
+      "sha256": "b3cec892a62c73d34f9c408ef584406b1ec930a4c98413d510d046da4e1e825c"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "src/transport/integrations.ts",
+      "bytes": 68923,
+      "sha256": "258e1793b705d7407f33df559cdc6652bafbbd2279e9c6fef4067ab4391b43d7"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "src/transport/ports.ts",
+      "bytes": 2523,
+      "sha256": "412634e161f4339d28b1f2266ccd9442b0948a17f22a0ec25ffe95d8f5bc95d7"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "src/transport/service.ts",
+      "bytes": 93628,
+      "sha256": "ab812b420b1568e8398747c6155bd8951822c3350cd8bed70b3509800a48233c"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "test/unit/delivery-authority.spec.cjs",
+      "bytes": 6598,
+      "sha256": "7a11eb7c0f4712474edae0b162a43afa17523ceba2ef38c106d10289404b13a3"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/native-consent-bridge.test.ts",
+      "bytes": 13351,
+      "sha256": "c6dabb2cc3874985a087136388a598970c1f0b0d9a7d320812c478fb52750fd8"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/backend-negative.test.ts",
+      "bytes": 5138,
+      "sha256": "3db41fa4e750c5b394875c77ae695a2499d77b26b721390237a02049da90c81a"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/loopback-crm-load.mts",
+      "bytes": 8624,
+      "sha256": "52485110c5e36c0d7478eece40886a4d50f3d0e0c833c9da220e7ac5c7fff462"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/notification-source.tsconfig.json",
+      "bytes": 446,
+      "sha256": "c1475b4aee78428b82ab6ca2a274788a07688f08c8ef04bb4d6372c9200234d7"
+    },
+    {
+      "repository": "learning-service",
+      "path": "package.json",
+      "bytes": 532,
+      "sha256": "3667a4afa7231f0bd3aed6b33fb0f971d3b1ea045b42c024aa8590160019f66e"
+    },
+    {
+      "repository": "learning-service",
+      "path": "package-lock.json",
+      "bytes": 23378,
+      "sha256": "fd55324f3ef1dbf82c3cb64b5fd0059467e14344f1d09f44b1ca941c31fd73fb"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "package.json",
+      "bytes": 3302,
+      "sha256": "cb5d80c17afe72c14a05b758798ea3a5085f4716e37d1958b586e7ddaff691f8"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "package-lock.json",
+      "bytes": 216595,
+      "sha256": "eeb9453709f8ee1be550cfd24eae4d76efdfb93cc9f4bd03337a7ed5eafb856e"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "pnpm-lock.yaml",
+      "bytes": 282818,
+      "sha256": "90a3fb8dbe5ce30209a89204029c2a7b34c55913d5d5f69175322799b1f97539"
+    },
+    {
+      "repository": "notification-service",
+      "path": "package.json",
+      "bytes": 3903,
+      "sha256": "7c4ef1f0760ebc1de3e64c221fedc67e5bc8b004bd5dddd4eb57a44acd3c2e34"
+    },
+    {
+      "repository": "notification-service",
+      "path": "package-lock.json",
+      "bytes": 216601,
+      "sha256": "8b32a259257f2eac22190cb2f0313405a0357aef15b317ba2ad3afcaf858e137"
+    },
+    {
+      "repository": "notification-service",
+      "path": "pnpm-lock.yaml",
+      "bytes": 310194,
+      "sha256": "73327b5ead07d948e5ca359aac830242a5440ecdada903a2fd0a33fa98f4964f"
+    }
+  ],
+  "combinedSha256": "01da947f7764c41756f90a27b5e82bfc14a30e64be3ad245fe648af093105a10"
+}

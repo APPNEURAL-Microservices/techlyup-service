@@ -1,0 +1,289 @@
+{
+  "recordedAt": "2026-10-16T04:13:00.942843+00:00",
+  "scope": "Read-only comparison; no lockfile/manifest/install changes",
+  "repositories": {
+    "learning-service": {
+      "packageManager": "npm",
+      "npmLockVersion": 3,
+      "npmManifestDirectDrift": [],
+      "manifestSha256": "3667a4afa7231f0bd3aed6b33fb0f971d3b1ea045b42c024aa8590160019f66e",
+      "npmLockSha256": "fd55324f3ef1dbf82c3cb64b5fd0059467e14344f1d09f44b1ca941c31fd73fb"
+    },
+    "messaging-service": {
+      "packageManager": "pnpm@11.22.0",
+      "npmLockVersion": 3,
+      "npmManifestDirectDrift": [
+        {
+          "kind": "dependencies",
+          "package": "@fastify/cors",
+          "manifest": "11.2.0",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "@fastify/helmet",
+          "manifest": "13.1.1",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "@grpc/proto-loader",
+          "manifest": "0.8.1",
+          "npmLock": "0.8.0"
+        },
+        {
+          "kind": "dependencies",
+          "package": "@nestjs/platform-express",
+          "manifest": null,
+          "npmLock": "12.1.2"
+        },
+        {
+          "kind": "dependencies",
+          "package": "@nestjs/platform-fastify",
+          "manifest": "12.1.2",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "@opentelemetry/api",
+          "manifest": "1.9.1",
+          "npmLock": "1.9.0"
+        },
+        {
+          "kind": "dependencies",
+          "package": "@prisma/adapter-pg",
+          "manifest": "7.10.0",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "@prisma/client",
+          "manifest": "7.10.0",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "fastify",
+          "manifest": "5.12.5",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "libphonenumber-js",
+          "manifest": "1.13.14",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "nestjs-pino",
+          "manifest": "5.3.1",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "sanitize-html",
+          "manifest": "2.18.0",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "@apidevtools/swagger-parser",
+          "manifest": "13.1.0",
+          "npmLock": "12.1.0"
+        },
+        {
+          "kind": "devDependencies",
+          "package": "@nestjs/cli",
+          "manifest": "12.0.8",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "@types/jest",
+          "manifest": "30.0.0",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "@types/node",
+          "manifest": "24.19.1",
+          "npmLock": "24.10.1"
+        },
+        {
+          "kind": "devDependencies",
+          "package": "@types/pg",
+          "manifest": "8.23.1",
+          "npmLock": "8.15.6"
+        },
+        {
+          "kind": "devDependencies",
+          "package": "@types/sanitize-html",
+          "manifest": "2.16.2",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "@types/supertest",
+          "manifest": "7.2.1",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "jest",
+          "manifest": "30.5.2",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "prettier",
+          "manifest": "3.9.9",
+          "npmLock": "3.7.4"
+        },
+        {
+          "kind": "devDependencies",
+          "package": "prisma",
+          "manifest": "7.10.0",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "supertest",
+          "manifest": "7.3.1",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "testcontainers",
+          "manifest": "12.2.0",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "typescript-eslint",
+          "manifest": "8.71.1",
+          "npmLock": "8.71.0"
+        }
+      ],
+      "manifestSha256": "cb5d80c17afe72c14a05b758798ea3a5085f4716e37d1958b586e7ddaff691f8",
+      "npmLockSha256": "eeb9453709f8ee1be550cfd24eae4d76efdfb93cc9f4bd03337a7ed5eafb856e",
+      "pnpmLockVersion": "9.0",
+      "pnpmToolVersion": "11.22.0",
+      "pnpmManifestDirectDrift": [],
+      "pnpmLockSha256": "90a3fb8dbe5ce30209a89204029c2a7b34c55913d5d5f69175322799b1f97539"
+    },
+    "notification-service": {
+      "packageManager": "pnpm@11.22.0",
+      "npmLockVersion": 3,
+      "npmManifestDirectDrift": [
+        {
+          "kind": "dependencies",
+          "package": "@fastify/cors",
+          "manifest": "11.2.0",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "@fastify/helmet",
+          "manifest": "13.1.1",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "@js-temporal/polyfill",
+          "manifest": "0.5.1",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "@nestjs/platform-fastify",
+          "manifest": "12.1.2",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "@prisma/adapter-pg",
+          "manifest": "7.10.0",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "@prisma/client",
+          "manifest": "7.10.0",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "fastify",
+          "manifest": "5.12.5",
+          "npmLock": null
+        },
+        {
+          "kind": "dependencies",
+          "package": "nestjs-pino",
+          "manifest": "5.3.1",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "@nestjs/cli",
+          "manifest": "12.0.8",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "@types/jest",
+          "manifest": "30.0.0",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "@types/pg",
+          "manifest": "8.23.1",
+          "npmLock": "8.15.6"
+        },
+        {
+          "kind": "devDependencies",
+          "package": "@types/supertest",
+          "manifest": "7.2.1",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "jest",
+          "manifest": "30.5.2",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "prettier",
+          "manifest": "3.9.9",
+          "npmLock": "3.7.4"
+        },
+        {
+          "kind": "devDependencies",
+          "package": "prisma",
+          "manifest": "7.10.0",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "supertest",
+          "manifest": "7.3.1",
+          "npmLock": null
+        },
+        {
+          "kind": "devDependencies",
+          "package": "testcontainers",
+          "manifest": "12.2.0",
+          "npmLock": null
+        }
+      ],
+      "manifestSha256": "7c4ef1f0760ebc1de3e64c221fedc67e5bc8b004bd5dddd4eb57a44acd3c2e34",
+      "npmLockSha256": "8b32a259257f2eac22190cb2f0313405a0357aef15b317ba2ad3afcaf858e137",
+      "pnpmLockVersion": "9.0",
+      "pnpmToolVersion": "11.22.0",
+      "pnpmManifestDirectDrift": [],
+      "pnpmLockSha256": "73327b5ead07d948e5ca359aac830242a5440ecdada903a2fd0a33fa98f4964f"
+    }
+  }
+}

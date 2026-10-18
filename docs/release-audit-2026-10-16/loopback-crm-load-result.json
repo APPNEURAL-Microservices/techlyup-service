@@ -1,0 +1,82 @@
+{
+  "startedAt": "2026-10-16T03:50:08.137Z",
+  "completedAt": "2026-10-16T03:50:15.025Z",
+  "environment": {
+    "scope": "isolated loopback workerd and SQLite-backed local D1; not staging or Cloudflare deployed capacity",
+    "node": "v24.20.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "concurrency": 10,
+    "uniqueSyntheticContacts": 40,
+    "trustedIpSimulation": "40 distinct benchmarking-range headers, accepted only inside this isolated harness; no production trust bypass",
+    "sendingEnabled": false,
+    "integrationsEnabled": false,
+    "analyticsExportEnabled": false
+  },
+  "summary": {
+    "requests": 60,
+    "p50Ms": 42.35,
+    "p95Ms": 67.88,
+    "p99Ms": 68.17,
+    "maximumMs": 68.17,
+    "successes": 60,
+    "failureCodes": []
+  },
+  "phases": {
+    "capture": {
+      "requests": 40,
+      "p50Ms": 43.25,
+      "p95Ms": 67.89,
+      "p99Ms": 68.17,
+      "maximumMs": 68.17,
+      "successes": 40,
+      "failureCodes": []
+    },
+    "idempotency_replay": {
+      "requests": 10,
+      "p50Ms": 29.3,
+      "p95Ms": 29.73,
+      "p99Ms": 29.73,
+      "maximumMs": 29.73,
+      "successes": 10,
+      "failureCodes": []
+    },
+    "contact_deduplication": {
+      "requests": 10,
+      "p50Ms": 38.62,
+      "p95Ms": 38.92,
+      "p99Ms": 38.92,
+      "maximumMs": 38.92,
+      "successes": 10,
+      "failureCodes": []
+    }
+  },
+  "elapsedRunMs": 280.71,
+  "persisted": {
+    "contacts": 40,
+    "leads": 40,
+    "captureReceipts": 50,
+    "captureAudits": 50,
+    "communicationJobs": 0,
+    "verifiedPermissions": 0
+  },
+  "integrity": {
+    "foreignKeyViolations": 0,
+    "quickCheck": "ok"
+  },
+  "databaseQueryCount": "Not instrumented. Persisted audit/receipt counts are not SQL query counts.",
+  "limitations": [
+    "No attendee/stream/provider/payment/notification/AI cost load tested.",
+    "Warm local request sample only; bootstrap excluded.",
+    "No production throughput or SLA extrapolation."
+  ],
+  "sourceSha256": {
+    "apps/api/src/index.ts": "538d1a08098bd77214ae34dce75538a374d20c85bb8af450c8883c12a5ff312d",
+    "apps/api/src/crm/http.ts": "ae29c9c7bb8fae69d6be9fddcb36b20b6e942e081913c77a2bd9f81517892f1c",
+    "apps/api/src/crm/repository.ts": "9b30a49f5a467e6e637735b3cda7a7182677199ce65179928c82ab87b19e7ab8",
+    "migrations/d1/0048_crm_acquisition.sql": "5977484f8c602f53105ec8b12d3c5ffbd85a156150324288244720c06a15f872",
+    "migrations/d1/0049_crm_canonical_sources.sql": "e7bcee490b2b88479c834967c27e2c9acca14efc23684b03ca895709ca6f006b",
+    "migrations/d1/0050_crm_visitors.sql": "273e2e845d185e5dd34bc9bd06fc9c8b2e23ad7e0568bdba33fcc209ba0ea0e9",
+    "migrations/d1/0051_crm_staff_alerts.sql": "5ff8b5ca5e0d09c9c0622f9715351a71b61cfe29e904ea4ce2e552e6313e34df"
+  }
+}

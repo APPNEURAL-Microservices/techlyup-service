@@ -1,0 +1,229 @@
+{
+  "recordedAt": "2026-10-16T04:13:20.134214+00:00",
+  "sourceReleaseStatus": "Uncommitted/untracked local changes; no deployment performed",
+  "backendAuditCreated": [
+    "docs/release-audit-2026-10-16/README.md",
+    "docs/release-audit-2026-10-16/backend-dependency-audit.json",
+    "docs/release-audit-2026-10-16/backend-negative.test.ts",
+    "docs/release-audit-2026-10-16/commands-and-results.json",
+    "docs/release-audit-2026-10-16/loopback-crm-load-result.json",
+    "docs/release-audit-2026-10-16/loopback-crm-load.mts",
+    "docs/release-audit-2026-10-16/native-consent-bridge.test.ts",
+    "docs/release-audit-2026-10-16/notification-source.tsconfig.json",
+    "docs/release-audit-2026-10-16/source-manifest.json",
+    "scripts/test-native-bridge.mjs",
+    "docs/release-audit-2026-10-16/dependency-lock-compatibility.json",
+    "docs/release-audit-2026-10-16/learning-service-dependency-audit.json",
+    "docs/release-audit-2026-10-16/messaging-service-dependency-audit.json",
+    "docs/release-audit-2026-10-16/messaging-service-pnpm-dependency-audit.json",
+    "docs/release-audit-2026-10-16/notification-service-dependency-audit.json",
+    "docs/release-audit-2026-10-16/notification-service-pnpm-dependency-audit.json"
+  ],
+  "backendAuditModified": [
+    "README.md",
+    "package.json",
+    "docs/crm-provider-protocols.md"
+  ],
+  "nativeOwnerChanges": {
+    "notification-service": {
+      "modifiedDuringAudit": [
+        "src/orchestration/service.ts",
+        "src/orchestration/delivery-source.ts"
+      ],
+      "createdDuringAudit": [
+        "test/unit/delivery-source.test.cjs"
+      ],
+      "note": "delivery-source.ts was already an untracked unfinished helper at audit start; hardened during this audit. Entire source feature needs owning-repository review/release."
+    },
+    "messaging-service": {
+      "modifiedDuringAudit": [
+        "src/transport/delivery-authority.ts"
+      ],
+      "createdDuringAudit": [
+        "test/unit/delivery-authority.spec.cjs"
+      ],
+      "requiredExistingUnreleasedDiffs": [
+        "src/transport/integrations.ts",
+        "src/transport/ports.ts",
+        "src/transport/service.ts"
+      ],
+      "note": "delivery-authority.ts was already an untracked unfinished helper at audit start. Corrected wire bytes and formatted; all feature files require owning-repository review/release."
+    }
+  },
+  "files": [
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/README.md",
+      "sha256": "a36e8f38e11321baae7ff3c224c782025d10c862a1090f295a2dc94b2246ba4f",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/backend-dependency-audit.json",
+      "sha256": "b5f55eab214b7235c5e3133fa1764001150b39821e199939da6adb1c3b650477",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/backend-negative.test.ts",
+      "sha256": "3db41fa4e750c5b394875c77ae695a2499d77b26b721390237a02049da90c81a",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/commands-and-results.json",
+      "sha256": "5ad255f035a5e39e6e182373cf4e3dbbc2eb03d97fee587dcd0971f844549714",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/loopback-crm-load-result.json",
+      "sha256": "6ae96d2b90ad66872c076ebddde4c88758e8abebfb71cd3584e97e53e00823ae",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/loopback-crm-load.mts",
+      "sha256": "52485110c5e36c0d7478eece40886a4d50f3d0e0c833c9da220e7ac5c7fff462",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/native-consent-bridge.test.ts",
+      "sha256": "c6dabb2cc3874985a087136388a598970c1f0b0d9a7d320812c478fb52750fd8",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/notification-source.tsconfig.json",
+      "sha256": "c1475b4aee78428b82ab6ca2a274788a07688f08c8ef04bb4d6372c9200234d7",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/source-manifest.json",
+      "sha256": "6123fb24de592896564d42c01f237aacb9225ed7f2b81fca1719c9b65ce6d353",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "scripts/test-native-bridge.mjs",
+      "sha256": "7c37d57be4df0b38c10b2785772117c5098dd8cdd0d69e00761a532f0dda3552",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "README.md",
+      "sha256": "991c21e1c2c582749907e07477e142ce467b8f49c2e26fc49236721193d9335e",
+      "state": "modified-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "package.json",
+      "sha256": "9aeaa615aa1256618fde2e2ee80d9893b9dd0408e62efd8e22511491d9cdd0db",
+      "state": "modified-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/crm-provider-protocols.md",
+      "sha256": "645627c81feafa91428b57fdef2312ca3498ec2fa6f80ab052ab3bfb0794606b",
+      "state": "modified-in-audit"
+    },
+    {
+      "repository": "notification-service",
+      "path": "src/orchestration/service.ts",
+      "sha256": "4b67ff8c1916ca93855a7cd7deafc1aea540f2e2a0d6adba40151aebc9a60c6c",
+      "state": "modifiedDuringAudit"
+    },
+    {
+      "repository": "notification-service",
+      "path": "src/orchestration/delivery-source.ts",
+      "sha256": "ee5ac805d831e6043cff1d7d9b2ddad30a5710cb2a8e4373ba2a0753ee3fff87",
+      "state": "modifiedDuringAudit"
+    },
+    {
+      "repository": "notification-service",
+      "path": "test/unit/delivery-source.test.cjs",
+      "sha256": "b6c1d1ba11317f180d74aa577a3bfe2a88afd9e06de332852843c39f7aa1be4d",
+      "state": "createdDuringAudit"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "src/transport/delivery-authority.ts",
+      "sha256": "b3cec892a62c73d34f9c408ef584406b1ec930a4c98413d510d046da4e1e825c",
+      "state": "modifiedDuringAudit"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "test/unit/delivery-authority.spec.cjs",
+      "sha256": "7a11eb7c0f4712474edae0b162a43afa17523ceba2ef38c106d10289404b13a3",
+      "state": "createdDuringAudit"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "src/transport/integrations.ts",
+      "sha256": "258e1793b705d7407f33df559cdc6652bafbbd2279e9c6fef4067ab4391b43d7",
+      "state": "requiredExistingUnreleasedDiffs"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "src/transport/ports.ts",
+      "sha256": "412634e161f4339d28b1f2266ccd9442b0948a17f22a0ec25ffe95d8f5bc95d7",
+      "state": "requiredExistingUnreleasedDiffs"
+    },
+    {
+      "repository": "messaging-service",
+      "path": "src/transport/service.ts",
+      "sha256": "ab812b420b1568e8398747c6155bd8951822c3350cd8bed70b3509800a48233c",
+      "state": "requiredExistingUnreleasedDiffs"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/dependency-lock-compatibility.json",
+      "sha256": "206198d0901f61138cce10e2dd29df9eb92d82e6163a03bc2aef8e6ae3ba23f7",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/learning-service-dependency-audit.json",
+      "sha256": "1b6b3164c5fa281e87767fad78f19f851b622833ffec32d6258c569111fc7738",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/messaging-service-dependency-audit.json",
+      "sha256": "4e3c9a3b0034a538a6d5827af69ad1edf50e7b30f2ea9bf18b23cd3b778041f4",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/messaging-service-pnpm-dependency-audit.json",
+      "sha256": "69933dd269108d7715df10f03735a2a01b06fb39ef33518e34a7879304df70b2",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/notification-service-dependency-audit.json",
+      "sha256": "316c648ba6cee18c32508f6eb733547feb20eae5b10c53cfdf7c1bf7e43aadf2",
+      "state": "created-in-audit"
+    },
+    {
+      "repository": "techlyup-service",
+      "path": "docs/release-audit-2026-10-16/notification-service-pnpm-dependency-audit.json",
+      "sha256": "3c2cf90ed6f0a3fd37ab004414767811e5f71a580f945a605de6a680128c7a27",
+      "state": "created-in-audit"
+    }
+  ],
+  "generatedOnly": [
+    "messaging-service/node_modules generated Prisma client",
+    "messaging-service/dist current TypeScript output",
+    "notification-service/dist orchestration dependency closure",
+    "techlyup-service/apps/api/dist source-only dry run"
+  ],
+  "untouchedDomains": [
+    "No database migration SQL changed by this release audit",
+    "No new real user/customer/provider credentials/data",
+    "No deployed configuration or real provider action"
+  ],
+  "dependencyAuditOnlyUpdate": "Added read-only learning/npm and native npm/pnpm advisory receipts, explicit manifest drift and docs; no manifests, lockfiles or runtime source mutated."
+}

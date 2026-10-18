@@ -1,0 +1,77 @@
+name: Validate Microservices-owned TechlyUp backend
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: techlyup-backend-validation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: ci_owner
+          POSTGRES_PASSWORD: isolated-ci-only-password
+          POSTGRES_DB: techlyup_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ci_owner -d techlyup_ci"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      CI: '1'
+      WRANGLER_SEND_METRICS: 'false'
+      APP_RUNTIME_ACCEPTANCE: 'true'
+      APP_TEST_DATABASE_URL: postgresql://ci_owner:isolated-ci-only-password@127.0.0.1:5432/techlyup_ci
+    defaults:
+      run:
+        working-directory: techlyup-service
+    steps:
+      - name: Check out this independent backend
+        uses: actions/checkout@v4
+        with:
+          path: techlyup-service
+          persist-credentials: false
+      - name: Check out reviewed shared-platform source
+        uses: actions/checkout@v4
+        with:
+          repository: APPNEURAL-Microservices/cloudflare
+          ref: 6c4b52c8764a1500b0ca1a54bae9a33aa0055e67
+          path: cloudflare
+          token: ${{ secrets.SHARED_PLATFORM_READ_TOKEN || github.token }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            techlyup-service/package-lock.json
+            cloudflare/package-lock.json
+      - name: Install locked backend and packed shared dependency
+        run: npm ci
+      - name: Install existing platform harness dependencies
+        working-directory: cloudflare
+        run: npm ci
+      - name: Verify backend and platform-client types
+        run: npm run typecheck
+      - name: Execute API, Worker/PostgreSQL and platform contracts
+        run: npm test
+      - name: Dependency security gate
+        run: npm audit --audit-level=high
+      - name: Package API source without generated app assets
+        working-directory: techlyup-service/apps/api
+        run: npx wrangler deploy --config wrangler.ci.jsonc --dry-run --outdir dist
+      - name: Retain source packaging for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: techlyup-api-source-package
+          path: techlyup-service/apps/api/dist
+          if-no-files-found: warn
+          retention-days: 7
+      # No deployment, remote migration or production/provider credentials.

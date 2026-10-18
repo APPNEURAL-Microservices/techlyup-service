@@ -1,0 +1,15 @@
+{
+  "extends": "../../../notification-service/tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"],
+    "typeRoots": ["../../node_modules/@types"],
+    "baseUrl": ".",
+    "paths": {
+      "zod": ["../../node_modules/zod"],
+      "@js-temporal/polyfill": ["../../../cloudflare/node_modules/@js-temporal/polyfill"]
+    }
+  },
+  "files": ["../../../notification-service/src/orchestration/service.ts"],
+  "include": []
+}

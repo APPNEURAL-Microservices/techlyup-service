@@ -1,0 +1,24 @@
+{
+  "name": "@techlyup/api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev --local --ip 127.0.0.1 --port 8788",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "tsx --test tests/*.test.ts",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "migrate:local": "wrangler d1 migrations apply REGISTRATIONS_DB --local",
+    "db:local": "node scripts/bootstrap-local.mjs"
+  },
+  "dependencies": {
+    "@techlyup/contracts": "0.1.1",
+    "zod": "^4.6.7",
+    "@appneurox/learning-postgres": "file:../../vendor/appneurox-learning-postgres-0.1.0.tgz",
+    "@appneurox/platform-client": "0.1.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.151.0"
+  }
+}

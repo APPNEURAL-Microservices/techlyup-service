@@ -1,0 +1,26 @@
+{
+  "repository": "notification-service",
+  "command": "COREPACK_ENABLE_NETWORK=0 pnpm audit --json",
+  "toolVersion": "11.22.0",
+  "exitCode": 0,
+  "scope": "Current declared pnpm lock graph; advisory scan only, not runtime/security approval",
+  "status": "Pass",
+  "lockfile": "pnpm-lock.yaml",
+  "lockfileSha256": "73327b5ead07d948e5ca359aac830242a5440ecdada903a2fd0a33fa98f4964f",
+  "manifestDirectDriftCount": 0,
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 424,
+    "devDependencies": 497,
+    "optionalDependencies": 82,
+    "totalDependencies": 959
+  },
+  "advisories": {},
+  "recordedAt": "2026-10-16T04:13:00.942605+00:00"
+}

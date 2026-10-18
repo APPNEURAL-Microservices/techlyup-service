@@ -1,0 +1,278 @@
+{
+  "recordedAt": "2026-10-16T04:13:00.943621+00:00",
+  "commands": [
+    {
+      "cwd": "Microservices/techlyup-service",
+      "command": "npm run typecheck && npm test",
+      "result": "Pass",
+      "counts": {
+        "tests": 73,
+        "passed": 73,
+        "failed": 0,
+        "skipped": 0
+      },
+      "finalDurationMs": 69504.593333,
+      "scope": "Includes isolated actual workerd/D1, workerd/restricted-role PostgreSQL and current edge owner contracts; no staging/providers"
+    },
+    {
+      "cwd": "Microservices/learning-service",
+      "command": "npm run typecheck && npm test",
+      "result": "Pass",
+      "counts": {
+        "tests": 9,
+        "passed": 9,
+        "failed": 0,
+        "skipped": 0
+      },
+      "durationMs": 2050.3915,
+      "scope": "Actual throwaway PostgreSQL migration/idempotency/RLS/audit journeys"
+    },
+    {
+      "cwd": "Microservices/techlyup-service",
+      "command": "npm run test:native-bridge",
+      "result": "Pass",
+      "counts": {
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      "scope": "Explicit cross-owner source, actual CRM handler+SQLite, actual native final dispatch guard/provider adapter, synthetic loopback vendor only"
+    },
+    {
+      "cwd": "Microservices/techlyup-service",
+      "command": "node_modules/.bin/tsx --test docs/release-audit-2026-10-16/backend-negative.test.ts",
+      "result": "Pass",
+      "counts": {
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      "durationMs": 2735.648416,
+      "scope": "Actual handlers over complete isolated canonical schema; representative roles, foreign-organization admin denial, CSRF, bounded literal SQL values; not browser XSS execution"
+    },
+    {
+      "cwd": "Microservices/messaging-service",
+      "command": "node_modules/.bin/prisma generate --no-hints && node_modules/.bin/tsc --noEmit",
+      "result": "Pass",
+      "scope": "Generated local client only; no database access"
+    },
+    {
+      "cwd": "Microservices/messaging-service",
+      "command": "node_modules/.bin/tsc && node --experimental-vm-modules node_modules/jest/bin/jest.js --selectProjects unit --runInBand",
+      "result": "Pass",
+      "counts": {
+        "suites": 4,
+        "tests": 57,
+        "passed": 57,
+        "failed": 0
+      },
+      "durationMs": 1553,
+      "scope": "Current compiled native source; includes four new authority regressions. No remote provider configuration/delivery proved."
+    },
+    {
+      "cwd": "Microservices/techlyup-service",
+      "command": "../messaging-service/node_modules/.bin/tsc -p docs/release-audit-2026-10-16/notification-source.tsconfig.json",
+      "result": "Pass",
+      "scope": "Strict notification orchestration dependency-closure check using existing sibling dependencies; not entire notification package build"
+    },
+    {
+      "cwd": "Microservices/techlyup-service",
+      "command": "../messaging-service/node_modules/.bin/tsc -p docs/release-audit-2026-10-16/notification-source.tsconfig.json --noEmit false && NODE_PATH=\"$PWD/node_modules:../cloudflare/node_modules:../messaging-service/node_modules\" node ../messaging-service/node_modules/jest/bin/jest.js --config ../notification-service/jest.config.cjs --selectProjects unit --runInBand --runTestsByPath ../notification-service/test/unit/delivery-source.test.cjs",
+      "result": "Pass",
+      "counts": {
+        "suites": 1,
+        "tests": 3,
+        "passed": 3,
+        "failed": 0
+      },
+      "durationMs": 1983,
+      "scope": "New provenance/digest regression subset only"
+    },
+    {
+      "cwd": "Microservices/techlyup-service",
+      "command": "npm audit --audit-level=high --json",
+      "result": "Pass",
+      "counts": {
+        "dependencies": 118,
+        "vulnerabilities": 0,
+        "high": 0,
+        "critical": 0
+      },
+      "evidence": "backend-dependency-audit.json"
+    },
+    {
+      "cwd": "Microservices/techlyup-service/apps/api",
+      "command": "../../node_modules/.bin/wrangler deploy --config wrangler.ci.jsonc --dry-run --outdir dist",
+      "result": "Pass",
+      "uploadKiB": 1174.98,
+      "gzipKiB": 209.22,
+      "scope": "API source package only; no deployment/no assets/no production bindings"
+    },
+    {
+      "cwd": "Microservices/techlyup-service",
+      "command": "node_modules/.bin/tsx docs/release-audit-2026-10-16/loopback-crm-load.mts",
+      "result": "Pass",
+      "counts": {
+        "requests": 60,
+        "successes": 60,
+        "contacts": 40,
+        "captureReceipts": 50,
+        "captureAudits": 50,
+        "foreignKeyViolations": 0
+      },
+      "evidence": "loopback-crm-load-result.json",
+      "scope": "Owned loopback actual workerd/D1, sending/integrations/external analytics disabled; not remote capacity"
+    },
+    {
+      "cwd": "Microservices/learning-service",
+      "command": "npm audit --json",
+      "result": "Pass",
+      "exitCode": 0,
+      "scope": "Current npm lock graph",
+      "counts": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 17,
+          "dev": 33,
+          "optional": 28,
+          "peer": 0,
+          "peerOptional": 0,
+          "total": 50
+        }
+      },
+      "evidence": "learning-service-dependency-audit.json"
+    },
+    {
+      "cwd": "Microservices/messaging-service",
+      "command": "npm audit --json",
+      "result": "Partial",
+      "exitCode": 0,
+      "scope": "Stale npm lock snapshot only; does not cover the active pnpm graph",
+      "counts": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 135,
+          "dev": 249,
+          "optional": 77,
+          "peer": 73,
+          "peerOptional": 0,
+          "total": 456
+        }
+      },
+      "evidence": "messaging-service-dependency-audit.json"
+    },
+    {
+      "cwd": "Microservices/messaging-service",
+      "command": "COREPACK_ENABLE_NETWORK=0 pnpm audit --json",
+      "result": "Pass",
+      "exitCode": 0,
+      "scope": "Current declared pnpm lock graph; advisory scan only, not runtime/security approval",
+      "counts": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "dependencies": 321,
+        "devDependencies": 558,
+        "optionalDependencies": 45,
+        "totalDependencies": 880
+      },
+      "evidence": "messaging-service-pnpm-dependency-audit.json"
+    },
+    {
+      "cwd": "Microservices/notification-service",
+      "command": "npm audit --json",
+      "result": "Partial",
+      "exitCode": 0,
+      "scope": "Stale npm lock snapshot only; does not cover the active pnpm graph",
+      "counts": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 207,
+          "dev": 249,
+          "optional": 5,
+          "peer": 1,
+          "peerOptional": 0,
+          "total": 456
+        }
+      },
+      "evidence": "notification-service-dependency-audit.json"
+    },
+    {
+      "cwd": "Microservices/notification-service",
+      "command": "COREPACK_ENABLE_NETWORK=0 pnpm audit --json",
+      "result": "Pass",
+      "exitCode": 0,
+      "scope": "Current declared pnpm lock graph; advisory scan only, not runtime/security approval",
+      "counts": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "dependencies": 424,
+        "devDependencies": 497,
+        "optionalDependencies": 82,
+        "totalDependencies": 959
+      },
+      "evidence": "notification-service-pnpm-dependency-audit.json"
+    }
+  ],
+  "initialFailuresAndResolution": [
+    {
+      "command": "node_modules/.bin/tsc --noEmit (messaging-service, initial)",
+      "result": "Failed",
+      "cause": "Existing Prisma client had not been generated; no exported PrismaClient/Prisma types. Ran local prisma generate and compile succeeded."
+    },
+    {
+      "command": "node_modules/.bin/tsx --test docs/release-audit-2026-10-16/native-consent-bridge.test.ts (initial)",
+      "result": "Failed",
+      "cause": "notification-service dependencies absent from its own node_modules. Explicit test launcher now requires reviewed siblings and resolves their existing dependencies without installation."
+    },
+    {
+      "command": "NODE_PATH=\"$PWD/node_modules\" node_modules/.bin/tsx --test docs/release-audit-2026-10-16/native-consent-bridge.test.ts (intermediate fixture)",
+      "result": "Failed",
+      "cause": "Synthetic gateway receipt included unsupported extra request fields; actual strict provider correctly reported unknown. Test gateway corrected to exact response contract; final passes."
+    }
+  ],
+  "notRun": [
+    "Remote migrations",
+    "Production deploy",
+    "Real charges/refunds",
+    "Actual email/WhatsApp/push communications",
+    "Full notification package build/integration suite",
+    "Device/simulator installs",
+    "Attendee/streaming/payment/provider/AI load",
+    "Backup restore drill"
+  ],
+  "allFinalExecutedChecksPassed": false,
+  "finalGateNote": "All functional test/build checks passed. Dependency advisories are zero in the current owner lock graphs; native legacy npm snapshot checks are Partial because those files drift from the pnpm-managed manifests."
+}

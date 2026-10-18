@@ -1,0 +1,18 @@
+{
+  "name": "@appneurox/techlyup-service",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "dev": "npm run dev -w @techlyup/api",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "tsx --test --test-concurrency=1 apps/api/tests/*.test.ts packages/platform-client/tests/*.test.ts",
+    "test:native-bridge": "node scripts/test-native-bridge.mjs",
+    "build": "npm run build -w @techlyup/api",
+    "db:local": "npm run db:local -w @techlyup/api",
+    "contracts:pack": "npm pack -w @techlyup/contracts --pack-destination vendor"
+  },
+  "devDependencies": { "@types/node": "^24.0.0", "@types/pg": "8.23.1", "pg": "8.23.1", "tsx": "^4.23.13", "typescript": "~6.0.3" }
+}

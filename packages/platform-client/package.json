@@ -1,0 +1,9 @@
+{
+  "name": "@appneurox/platform-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc --noEmit -p tsconfig.json", "test": "tsx --test tests/*.test.ts" },
+  "dependencies": { "zod": "^4.6.7" }
+}

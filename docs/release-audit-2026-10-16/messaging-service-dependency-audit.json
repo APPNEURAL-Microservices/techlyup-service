@@ -1,0 +1,31 @@
+{
+  "repository": "messaging-service",
+  "command": "npm audit --json",
+  "exitCode": 0,
+  "scope": "Stale npm lock snapshot only; does not cover the active pnpm graph",
+  "status": "Partial",
+  "lockfile": "package-lock.json",
+  "lockfileSha256": "eeb9453709f8ee1be550cfd24eae4d76efdfb93cc9f4bd03337a7ed5eafb856e",
+  "manifestDirectDriftCount": 25,
+  "auditReportVersion": 2,
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 135,
+      "dev": 249,
+      "optional": 77,
+      "peer": 73,
+      "peerOptional": 0,
+      "total": 456
+    }
+  },
+  "vulnerabilities": {},
+  "recordedAt": "2026-10-16T04:13:00.937341+00:00"
+}

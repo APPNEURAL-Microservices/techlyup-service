@@ -1,0 +1,31 @@
+{
+  "repository": "learning-service",
+  "command": "npm audit --json",
+  "exitCode": 0,
+  "scope": "Current npm lock graph",
+  "status": "Pass",
+  "lockfile": "package-lock.json",
+  "lockfileSha256": "fd55324f3ef1dbf82c3cb64b5fd0059467e14344f1d09f44b1ca941c31fd73fb",
+  "manifestDirectDriftCount": 0,
+  "auditReportVersion": 2,
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 17,
+      "dev": 33,
+      "optional": 28,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 50
+    }
+  },
+  "vulnerabilities": {},
+  "recordedAt": "2026-10-16T04:13:00.935212+00:00"
+}
