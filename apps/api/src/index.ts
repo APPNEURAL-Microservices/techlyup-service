@@ -36,12 +36,13 @@ async function route(request: Request, env: Env, requestId: string, settings: Re
   }
   if (path === '/api/v1/health' && request.method === 'GET') {
     if (!settings.enabled) return success({status:'disabled',enabled:false},requestId);
-    const row = await database(env).prepare("SELECT count(*) AS ready FROM sqlite_master WHERE type='table' AND name IN ('learner_accounts','live_core_staff_links','webinar_erp_roles','app_sessions','app_access_tokens','app_refresh_tokens','app_audit_events','app_analytics_events','app_rate_limits')").first<{ready:number}>();
-    if (row?.ready !== 9) throw new ApiError('storage_unavailable','App storage is not ready.',503);
+    // Staff links arrive with website 0041; without them every account is a learner, so they are reported, not required.
+    const row = await database(env).prepare("SELECT count(*) AS ready,sum(name='live_core_staff_links') AS staff FROM sqlite_master WHERE type='table' AND name IN ('learner_accounts','live_core_staff_links','webinar_erp_roles','app_sessions','app_access_tokens','app_refresh_tokens','app_audit_events','app_analytics_events','app_rate_limits','app_account_registrations','app_live_login_challenges')").first<{ready:number;staff:number}>();
+    if (row?.ready !== 10 + (row?.staff ? 1 : 0)) throw new ApiError('storage_unavailable','App storage is not ready.',503);
     if(settings.crm){
       if(!await crmStorageReady(database(env)))throw new ApiError('storage_unavailable','CRM storage is not ready.',503);
     }
-    return success({status:'ready',enabled:true},requestId);
+    return success({status:'ready',enabled:true,staffLinks:Boolean(row.staff)},requestId);
   }
   if(path==='/api/v1/crm/preferences/revoke')return (await handleCrmPublic(request,env,requestId,settings))!;
   if(path==='/api/v1/crm/visitor/consent')return (await handleVisitors(request,env,requestId,settings))!;

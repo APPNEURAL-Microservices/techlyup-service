@@ -81,3 +81,15 @@ test('a signed-out app session or a different account cannot complete another ap
     }
   }finally{f.close();}
 });
+
+test('a canonical database before website 0041 (no staff links) still serves signup and sign-in as learners only',async()=>{
+  const f=fixture();try{
+    f.sqlite.exec('DROP TABLE live_core_staff_links');
+    const health=await f.call('/health');assert.equal(health.response.status,200);assert.equal(health.body.data.staffLinks,false);
+    const session=(await account(f)).body.data;assert.deepEqual(session.user.roles,['learner']);assert.deepEqual(session.user.permissions,[]);
+    assert.equal((await f.call('/me',{access:session.accessToken})).response.status,200);
+    assert.equal((await f.call('/auth/login',{body:{email:signupInput.email,password:signupInput.password}})).response.status,200);
+    f.sqlite.exec('DROP TABLE app_account_registrations');
+    assert.equal((await f.call('/health')).response.status,503);
+  }finally{f.close();}
+});

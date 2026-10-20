@@ -3,10 +3,14 @@ import type { D1Database } from '../types';
 // Derived from canonical techlyup-next/src/lib/webinar-erp/contract.ts:29–54.
 // Read roles on every request; never accept a role from signup, a token or client.
 const ALL = ['read','private','operate','create','review','publish','finance','admin','certify','content','global','assess','grade','support','support_manage','export','mentor','mentor_manage'];
+// A canonical database that predates website 0041 has no staff-link table yet. Then nobody holds staff
+// authority (least privilege); any other storage error still fails the request.
+export const missingStaffLinks = (error: unknown) => error instanceof Error && /no such table: live_core_staff_links\b/.test(error.message);
 export async function authority(db: D1Database, orgId: string, account: { id: string; email: string }, now: string) {
   const link = await db.prepare(`SELECT actor_id,actor_role,actor_email FROM live_core_staff_links
     WHERE learner_account_id=? AND org_id=? AND revoked_at IS NULL AND expires_at>?`)
-    .bind(account.id, orgId, now).first<{ actor_id: string; actor_role: string; actor_email: string }>();
+    .bind(account.id, orgId, now).first<{ actor_id: string; actor_role: string; actor_email: string }>()
+    .catch(error => { if (missingStaffLinks(error)) return null; throw error; });
   if (!link || link.actor_email.toLowerCase() !== account.email.toLowerCase()) return { roles: ['learner'], permissions: [] as string[] };
   const rows = await db.prepare('SELECT functional_role FROM webinar_erp_roles WHERE org_id=? AND actor_id=?').bind(orgId, link.actor_id).all<{ functional_role: string }>();
   const roles = rows.results.map(row => row.functional_role);

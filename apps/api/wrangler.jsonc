@@ -33,5 +33,43 @@
   "assets": { "directory": "public", "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*", "/support/link"] },
   "observability": { "enabled": true },
   "triggers": { "crons": ["17 * * * *"] },
-  "limits": { "cpu_ms": 30000 }
+  "limits": { "cpu_ms": 30000 },
+  "env": {
+    // app.techlyup.com: registration and TechlyUp LIVE sign-in only. Every other capability stays off.
+    // Canonical learner accounts live in the website's existing D1 (techlyup-site REGISTRATIONS_DB).
+    "production": {
+      "name": "techlyup-app-api",
+      "workers_dev": false,
+      "preview_urls": false,
+      "routes": [{ "pattern": "app.techlyup.com", "custom_domain": true }],
+      "vars": {
+        "APP_ENV": "production",
+        "APP_ENABLED": "true",
+        "APP_SIGNUP_ENABLED": "true",
+        "APP_LIVE_LOGIN_ENABLED": "true",
+        "LIVE_LOGIN_CLIENT_ID": "techlyup-live",
+        "LIVE_LOGIN_APP_ORIGIN": "https://app.techlyup.com",
+        "LIVE_LOGIN_CALLBACK_URL": "https://live.techlyup.com/api/auth/techlyup/callback",
+        "APP_SUPPORT_CREDITS_ENABLED": "false",
+        "APP_SUPPORT_TEST_PAYMENTS_ENABLED": "false",
+        "APP_ANALYTICS_ENABLED": "false",
+        "APP_LEARNING_ENABLED": "false",
+        "APP_PLATFORM_ENABLED": "false",
+        "APP_CRM_ENABLED": "false",
+        "APP_CRM_CAPTURE_ENABLED": "false",
+        "APP_CRM_WEBINAR_ENABLED": "false",
+        "APP_CRM_SENDING_ENABLED": "false",
+        "APP_CRM_INTEGRATIONS_ENABLED": "false",
+        "CRM_ANALYTICS_EXPORT_ENABLED": "false",
+        "TECHLYUP_ERP_ORG_ID": "appneural",
+        "APP_ALLOWED_ORIGINS": "https://app.techlyup.com"
+      },
+      "d1_databases": [{
+        "binding": "REGISTRATIONS_DB",
+        "database_name": "techlyup-registrations",
+        "database_id": "e98173f2-34c9-4b47-b36c-755d2bf775dd",
+        "migrations_dir": "../../migrations/d1"
+      }]
+    }
+  }
 }
