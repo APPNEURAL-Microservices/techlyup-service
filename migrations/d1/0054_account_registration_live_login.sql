@@ -1,10 +1,11 @@
 -- Additive. Self-declared registration details for app-created accounts; account_type is descriptive, never a grant.
 CREATE TABLE app_account_registrations (
  account_id TEXT PRIMARY KEY REFERENCES learner_accounts(id) ON DELETE CASCADE,
- phone TEXT NOT NULL CHECK(phone GLOB '+91[6-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+ -- D1 caps GLOB patterns at 50 bytes, so formats are checked by length plus a short character-class pattern.
+ phone TEXT NOT NULL CHECK(length(phone)=13 AND substr(phone,1,4) GLOB '+91[6-9]' AND substr(phone,5) NOT GLOB '*[^0-9]*'),
  account_type TEXT NOT NULL CHECK(account_type IN ('student','teacher')),
  city TEXT NOT NULL CHECK(length(city) BETWEEN 2 AND 80),
- referral_code TEXT NOT NULL UNIQUE CHECK(referral_code GLOB 'TU[0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z]'),
+ referral_code TEXT NOT NULL UNIQUE CHECK(length(referral_code)=8 AND substr(referral_code,1,2)='TU' AND substr(referral_code,3) NOT GLOB '*[^0-9A-Z]*'),
  referred_by_account_id TEXT REFERENCES learner_accounts(id) ON DELETE SET NULL CHECK(referred_by_account_id IS NULL OR referred_by_account_id<>account_id),
  created_at TEXT NOT NULL,updated_at TEXT NOT NULL
 );
