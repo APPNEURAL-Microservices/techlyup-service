@@ -4,12 +4,12 @@ import { validateCrmProviders } from './crm/providers';
 export function config(env: Env) {
   const mode = env.APP_ENV ?? 'development';
   if (!['development', 'test', 'staging', 'production'].includes(mode)) throw new ApiError('configuration_required', 'App configuration is unavailable.', 503);
-  for (const key of ['APP_ENABLED', 'APP_SIGNUP_ENABLED', 'APP_ANALYTICS_ENABLED', 'APP_LEARNING_ENABLED', 'APP_LOCAL_POSTGRES','APP_PLATFORM_ENABLED','APP_CRM_ENABLED','APP_CRM_CAPTURE_ENABLED','APP_CRM_SENDING_ENABLED','APP_CRM_INTEGRATIONS_ENABLED','CRM_ANALYTICS_EXPORT_ENABLED','CRM_META_APPROVED','CRM_LINKEDIN_APPROVED','CRM_EXTERNAL_APPROVED','CRM_NOTIFICATION_ALLOW_LOCAL','CRM_NOTIFICATION_AUTHORITY_APPROVED'] as const) {
+  for (const key of ['APP_ENABLED', 'APP_SIGNUP_ENABLED', 'APP_ANALYTICS_ENABLED', 'APP_LEARNING_ENABLED', 'APP_LOCAL_POSTGRES','APP_PLATFORM_ENABLED','APP_CRM_ENABLED','APP_CRM_CAPTURE_ENABLED','APP_CRM_WEBINAR_ENABLED','APP_CRM_SENDING_ENABLED','APP_CRM_INTEGRATIONS_ENABLED','CRM_ANALYTICS_EXPORT_ENABLED','CRM_META_APPROVED','CRM_LINKEDIN_APPROVED','CRM_EXTERNAL_APPROVED','CRM_NOTIFICATION_ALLOW_LOCAL','CRM_NOTIFICATION_AUTHORITY_APPROVED'] as const) {
     if (env[key] !== undefined && env[key] !== 'true' && env[key] !== 'false') throw new ApiError('configuration_required', 'App configuration is unavailable.', 503);
   }
   if (env.APP_ENABLED !== 'true' && [env.APP_SIGNUP_ENABLED,env.APP_ANALYTICS_ENABLED,env.APP_LEARNING_ENABLED,env.APP_PLATFORM_ENABLED].includes('true')) throw new ApiError('configuration_required','App features require the app API to be enabled.',503);
   if (env.APP_CRM_ENABLED === 'true' && env.APP_ENABLED !== 'true') throw new ApiError('configuration_required','CRM requires the app API to be enabled.',503);
-  if (env.APP_CRM_ENABLED !== 'true' && [env.APP_CRM_CAPTURE_ENABLED,env.APP_CRM_SENDING_ENABLED,env.APP_CRM_INTEGRATIONS_ENABLED].includes('true')) throw new ApiError('configuration_required','CRM capabilities require the CRM module to be enabled.',503);
+  if (env.APP_CRM_ENABLED !== 'true' && [env.APP_CRM_CAPTURE_ENABLED,env.APP_CRM_WEBINAR_ENABLED,env.APP_CRM_SENDING_ENABLED,env.APP_CRM_INTEGRATIONS_ENABLED].includes('true')) throw new ApiError('configuration_required','CRM capabilities require the CRM module to be enabled.',503);
   if (env.CRM_NOTIFICATION_ALLOW_LOCAL === 'true' && !['development','test'].includes(mode)) throw new ApiError('configuration_required','Local notification routing is development-only.',503);
   if (env.APP_CRM_SENDING_ENABLED === 'true') {
     validateCrmProviders(env);

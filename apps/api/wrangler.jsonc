@@ -1,7 +1,7 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "techlyup-app-api",
-  "main": "src/index.ts",
+  "main": "src/worker.ts",
   "compatibility_date": "2026-10-13",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": false,
@@ -9,12 +9,15 @@
   "vars": {
     "APP_ENV": "development",
     "APP_ENABLED": "false",
+    "APP_SUPPORT_CREDITS_ENABLED": "false",
+    "APP_SUPPORT_TEST_PAYMENTS_ENABLED": "false",
     "APP_SIGNUP_ENABLED": "false",
     "APP_ANALYTICS_ENABLED": "false",
     "APP_LEARNING_ENABLED": "false",
     "APP_PLATFORM_ENABLED": "false",
     "APP_CRM_ENABLED": "false",
     "APP_CRM_CAPTURE_ENABLED": "false",
+    "APP_CRM_WEBINAR_ENABLED": "false",
     "APP_CRM_SENDING_ENABLED": "false",
     "APP_CRM_INTEGRATIONS_ENABLED": "false",
     "CRM_ANALYTICS_EXPORT_ENABLED": "false",
@@ -27,7 +30,7 @@
     "database_id": "00000000-0000-0000-0000-000000000000",
     "migrations_dir": "../../migrations/d1"
   }],
-  "assets": { "directory": "public", "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
+  "assets": { "directory": "public", "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*", "/support/link"] },
   "observability": { "enabled": true },
   "triggers": { "crons": ["17 * * * *"] },
   "limits": { "cpu_ms": 30000 }

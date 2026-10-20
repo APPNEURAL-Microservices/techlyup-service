@@ -18,6 +18,8 @@ export interface UserProfile {
   firstName?: string; middleName?: string; lastName?: string;
   audienceIds: string[]; goalIds: string[]; interestIds: string[];
   roles: string[]; permissions: string[];
+  /** Present for accounts created with the app registration form. */
+  registration?: AccountRegistration;
 }
 export interface AuthSession { user: UserProfile; accessToken: string; expiresIn: number; refreshToken?: string }
 export type LearningKind = 'course' | 'webinar' | 'mentorship' | 'career';
@@ -35,9 +37,23 @@ export interface LessonProgress { enrollmentId: string; lessonRef: string; statu
 
 const email = z.string().trim().toLowerCase().email('Enter a valid email address.').max(254);
 export const loginSchema = z.object({ email, password: z.string().min(1).max(128) }).strict();
+export const accountTypes = ['student', 'teacher'] as const;
+export type AccountType = typeof accountTypes[number];
+/** Self-declared registration details. accountType describes the person; it never grants a role or permission. */
+export interface AccountRegistration { accountType: AccountType; phone: string; city: string; referralCode: string }
+/** Indian mobile numbers, stored as +91XXXXXXXXXX. Accepts spaces, dashes and a +91, 91 or 0 prefix. */
+export const indianMobileSchema = z.string('Enter your mobile number.').trim().max(20, 'Enter a valid 10-digit mobile number.')
+  .transform(value => value.replace(/[\s()-]/g, '').replace(/^(?:\+91|0091|91|0)(?=[6-9]\d{9}$)/, ''))
+  .pipe(z.string().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit mobile number.'))
+  .transform(value => `+91${value}`);
+export const referralCodeSchema = z.string().trim().toUpperCase().regex(/^TU[0-9A-Z]{6}$/, 'Enter a valid referral code, like TU7K4M2Q.');
 export const signupSchema = z.object({
   firstName: z.string().trim().min(1, 'Enter your first name.').max(100), lastName: z.string().trim().min(1, 'Enter your last name.').max(100),
   email, password: z.string().min(12, 'Use at least 12 characters.').max(128),
+  phone: indianMobileSchema,
+  accountType: z.enum(accountTypes, 'Choose whether you are a student or a teacher.'),
+  city: z.string('Enter your city.').trim().min(2, 'Enter your city.').max(80, 'Use a shorter city name.').regex(/^\p{L}[\p{L}\p{M} .'-]*$/u, 'Enter a valid city name.'),
+  referralCode: z.preprocess(value => typeof value === 'string' && value.trim() === '' ? undefined : value, referralCodeSchema.optional()),
   consent: z.literal(true), consentVersion: z.literal('2026-10'),
 }).strict();
 export const profileSchema = z.object({

@@ -13,12 +13,14 @@
     "db:local": "node scripts/bootstrap-local.mjs"
   },
   "dependencies": {
-    "@techlyup/contracts": "0.1.1",
-    "zod": "^4.6.7",
     "@appneurox/learning-postgres": "file:../../vendor/appneurox-learning-postgres-0.1.0.tgz",
-    "@appneurox/platform-client": "0.1.0"
+    "@appneurox/platform-client": "0.1.0",
+    "@appneurox/razorpay-invoice-core": "file:../../vendor/appneurox-razorpay-invoice-core-0.1.0.tgz",
+    "@techlyup/contracts": "0.1.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261006.1",
     "wrangler": "^4.151.0"
   }
 }

@@ -33,7 +33,7 @@ test('native signup/me/logout shares canonical account identity and stores only 
 test('canonical website-format password hashes log in without creating or replacing users',async()=>{
   const f=fixture();try{
     const salt=Buffer.alloc(24,3),password=scryptSync(signupInput.password,salt,32,{N:32768,r:8,p:3,maxmem:64*1024*1024});
-    const stored=`scrypt$32768$8$3$${salt.toString('hex')}$${password.toString('hex')}`,id=`acct_${crypto.randomUUID()}`;
+    const stored=`scrypt$32768$8$3$${salt.toString('hex')}$${Buffer.from(password).toString('hex')}`,id=`acct_${crypto.randomUUID()}`;
     f.sqlite.prepare('INSERT INTO learner_accounts(id,email,name,password_hash,consent_version,created_at,updated_at) VALUES(?,?,?,?,?,?,?)').run(id,signupInput.email,'Canonical Learner',stored,'2026-10','2026-01-01','2026-01-01');
     f.sqlite.prepare('INSERT INTO learner_account_sessions(token_hash,account_id,expires_at,created_at) VALUES(?,?,?,?)').run('canonical-website-session-hash',id,'2099-01-01','2026-01-01');
     const result=await f.call('/auth/login',{body:{email:signupInput.email.toUpperCase(),password:signupInput.password}});

@@ -2,7 +2,7 @@
   "$schema": "../../node_modules/wrangler/config-schema.json",
   // API source packaging only: no web assets, public routes or live credentials.
   "name": "techlyup-api-source-validation",
-  "main": "src/index.ts",
+  "main": "src/worker.ts",
   "compatibility_date": "2026-10-13",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": false,
@@ -10,6 +10,8 @@
   "vars": {
     "APP_ENV": "test",
     "APP_ENABLED": "false",
+    "APP_SUPPORT_CREDITS_ENABLED": "false",
+    "APP_SUPPORT_TEST_PAYMENTS_ENABLED": "false",
     "APP_SIGNUP_ENABLED": "false",
     "APP_ANALYTICS_ENABLED": "false",
     "APP_LEARNING_ENABLED": "false",

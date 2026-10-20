@@ -15,6 +15,10 @@ import { runCrmAutomation } from './crm/automation';
 import { exportAnonymousEvents } from './crm/analytics-export';
 import { createCrmNotifications,handleCrmNotifications } from './crm/notifications';
 import {crmStorageReady} from './crm/schema';
+import {handleSupportHttp,supportLinkPage} from './credits/http';
+import {processSupportFunding} from './credits/payments';
+import {processWebinarCrmIntake} from './crm/webinar-ingestion';
+import {handleLiveLoginHttp} from './live/login';
 
 const refreshSchema = z.object({ refreshToken: z.string().max(100).optional() }).strict();
 const clientIp = (request: Request) => request.headers.get('cf-connecting-ip') ?? 'local';
@@ -42,6 +46,10 @@ async function route(request: Request, env: Env, requestId: string, settings: Re
   if(path==='/api/v1/crm/preferences/revoke')return (await handleCrmPublic(request,env,requestId,settings))!;
   if(path==='/api/v1/crm/visitor/consent')return (await handleVisitors(request,env,requestId,settings))!;
   if (!settings.enabled) throw new ApiError('feature_disabled','The TechlyUp app API is not enabled in this environment.',503);
+  const supportResponse=await handleSupportHttp(request,env,requestId);
+  if(supportResponse)return supportResponse;
+  const liveLoginResponse=await handleLiveLoginHttp(request,env,requestId,clientIp(request));
+  if(liveLoginResponse)return liveLoginResponse;
   const db = database(env), orgId = env.TECHLYUP_ERP_ORG_ID!;
   if(path.startsWith('/api/v1/crm/')){
     const visitorResponse=await handleVisitors(request,env,requestId,settings);
@@ -139,6 +147,8 @@ async function route(request: Request, env: Env, requestId: string, settings: Re
 }
 
 export async function fetch(request: Request, env: Env): Promise<Response> {
+  const supportPage=supportLinkPage(request,env);
+  if(supportPage)return supportPage;
   if (!new URL(request.url).pathname.startsWith('/api/')) {
     if(env.APP_ENV==='production'&&new URL(request.url).protocol!=='https:')return new Response('HTTPS is required.',{status:403});
     if (env.ASSETS) {
@@ -155,7 +165,7 @@ export async function fetch(request: Request, env: Env): Promise<Response> {
   const requestId=crypto.randomUUID();let origins:string[]=[];
   try {
     const settings=config(env);origins=settings.origins;
-    const relay = ['/api/v1/crm/webhooks/relay','/api/v1/crm/delivery/authorize'].includes(new URL(request.url).pathname) && request.method === 'POST';
+    const relay = ['/api/v1/crm/webhooks/relay','/api/v1/crm/delivery/authorize','/api/v1/support/webhook'].includes(new URL(request.url).pathname) && request.method === 'POST';
     if(relay){
       if(settings.mode==='production'&&new URL(request.url).protocol!=='https:')throw new ApiError('https_required','Use the secure TechlyUp app address.',403);
     } else checkOrigin(request,settings);
@@ -164,9 +174,11 @@ export async function fetch(request: Request, env: Env): Promise<Response> {
 }
 export async function scheduled(_event: unknown, env: Env) {
   await cleanup(env);
+  await processSupportFunding(env);
   const settings=config(env);
   if(settings.crm){
     await syncCanonicalCrm(env);
+    await processWebinarCrmIntake(env);
     await createCrmNotifications(env);
     await runCrmAutomation(env);
     await cleanVisitors(env);

@@ -1,4 +1,4 @@
-import type { AuthSession, ClientPlatform, ProfileInput, SignupInput, UserProfile } from '@techlyup/contracts';
+import type { AccountRegistration, AccountType, AuthSession, ClientPlatform, ProfileInput, SignupInput, UserProfile } from '@techlyup/contracts';
 import { ApiError, type D1Database } from '../types';
 import { DUMMY_HASH, hash, hashPassword, opaque, validToken, verifyPassword } from './crypto';
 import { authority } from './permissions';
@@ -24,9 +24,22 @@ function jsonIds(raw: string) {
   if (!Array.isArray(value) || !value.every(item => typeof item === 'string')) throw new Error('invalid_canonical_profile');
   return value as string[];
 }
+export async function accountRegistration(db: D1Database, accountId: string): Promise<AccountRegistration | undefined> {
+  const row = await db.prepare('SELECT account_type,phone,city,referral_code FROM app_account_registrations WHERE account_id=?').bind(accountId).first<{ account_type: AccountType; phone: string; city: string; referral_code: string }>();
+  return row ? { accountType: row.account_type, phone: row.phone, city: row.city, referralCode: row.referral_code } : undefined;
+}
 export async function userProfile(db: D1Database, orgId: string, row: AccountRow, now = new Date()): Promise<UserProfile> {
+  const registration = await accountRegistration(db, row.id);
   return { id: row.id, email: row.email, name: row.name, firstName: row.first_name ?? undefined, middleName: row.middle_name ?? undefined, lastName: row.last_name ?? undefined,
-    emailVerified: row.email_verified === 1, audienceIds: jsonIds(row.audience_ids), goalIds: jsonIds(row.goal_ids), interestIds: jsonIds(row.interest_ids), ...await authority(db, orgId, row, now.toISOString()) };
+    emailVerified: row.email_verified === 1, audienceIds: jsonIds(row.audience_ids), goalIds: jsonIds(row.goal_ids), interestIds: jsonIds(row.interest_ids), ...await authority(db, orgId, row, now.toISOString()),
+    ...(registration ? { registration } : {}) };
+}
+// Unambiguous characters only (no 0/O, 1/I/L) so codes survive being read aloud or retyped.
+const REFERRAL_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+function referralCode() {
+  let code = 'TU';
+  while (code.length < 8) for (const byte of crypto.getRandomValues(new Uint8Array(8))) if (byte < 248 && code.length < 8) code += REFERRAL_ALPHABET[byte % REFERRAL_ALPHABET.length];
+  return code;
 }
 export async function authenticate(db: D1Database, orgId: string, authorization: string | null, now = new Date()): Promise<Identity> {
   const token = authorization?.startsWith('Bearer ') ? authorization.slice(7) : '';
@@ -59,16 +72,23 @@ export async function signup(db: D1Database, orgId: string, input: SignupInput, 
     email_verified: 0, password_hash: password, audience_ids: '[]', goal_ids: '[]', interest_ids: '[]' };
   // Resolve required canonical role tables before any write, including for a new learner.
   const user = await userProfile(db,orgId,row,now);
-  try {
-    await db.batch([
-      db.prepare('INSERT INTO learner_accounts(id,email,name,first_name,last_name,password_hash,consent_version,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,input.email,row.name,input.firstName,input.lastName,password,input.consentVersion,c.createdAt,c.createdAt),
-      ...sessionStatements(db,c,'auth.signup',requestId),
-    ]);
-  } catch (error) {
-    if (error instanceof Error && /UNIQUE constraint failed: learner_accounts.email/.test(error.message)) throw new ApiError('account_unavailable', 'Unable to create an account with these details. Try signing in.', 409);
-    throw error;
+  const referrer = input.referralCode ? await db.prepare('SELECT account_id FROM app_account_registrations WHERE referral_code=?').bind(input.referralCode).first<{ account_id: string }>() : null;
+  if (input.referralCode && !referrer) throw new ApiError('validation_failed', 'Check the supplied details.', 422, { referralCode: 'This referral code is not valid. Check it or leave it empty.' });
+  for (let attempt = 1; ; attempt++) {
+    const registration: AccountRegistration = { accountType: input.accountType, phone: input.phone, city: input.city, referralCode: referralCode() };
+    try {
+      await db.batch([
+        db.prepare('INSERT INTO learner_accounts(id,email,name,first_name,last_name,password_hash,consent_version,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,input.email,row.name,input.firstName,input.lastName,password,input.consentVersion,c.createdAt,c.createdAt),
+        db.prepare('INSERT INTO app_account_registrations(account_id,phone,account_type,city,referral_code,referred_by_account_id,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)').bind(id,registration.phone,registration.accountType,registration.city,registration.referralCode,referrer?.account_id ?? null,c.createdAt,c.createdAt),
+        ...sessionStatements(db,c,'auth.signup',requestId),
+      ]);
+      return { user: { ...user, registration }, accessToken: c.accessToken, refreshToken: c.refreshToken, expiresIn: ACCESS_SECONDS };
+    } catch (error) {
+      if (error instanceof Error && /UNIQUE constraint failed: learner_accounts.email/.test(error.message)) throw new ApiError('account_unavailable', 'Unable to create an account with these details. Try signing in.', 409);
+      if (attempt < 3 && error instanceof Error && /UNIQUE constraint failed: app_account_registrations.referral_code/.test(error.message)) continue;
+      throw error;
+    }
   }
-  return { user, accessToken: c.accessToken, refreshToken: c.refreshToken, expiresIn: ACCESS_SECONDS };
 }
 export async function login(db: D1Database, orgId: string, email: string, password: string, client: ClientPlatform, requestId: string, now = new Date()): Promise<AuthSession> {
   const row = await db.prepare('SELECT * FROM learner_accounts WHERE email=?').bind(email).first<AccountRow>();

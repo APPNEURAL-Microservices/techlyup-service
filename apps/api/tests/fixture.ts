@@ -7,6 +7,7 @@ export function fixture(options:{fullCanonical?:boolean;crm?:boolean}={}) {
   const sqlite = new DatabaseSync(':memory:');
   sqlite.exec(readFileSync(new URL(options.fullCanonical?'./fixtures/website-schema-2026-10-16.sql':'./fixtures/canonical.sql',import.meta.url),'utf8'));
   sqlite.exec(readFileSync(new URL('../../../migrations/d1/0047_native_app_foundation.sql',import.meta.url),'utf8'));
+  sqlite.exec(readFileSync(new URL('../../../migrations/d1/0054_account_registration_live_login.sql',import.meta.url),'utf8'));
   if(options.crm){
     if(!options.fullCanonical)sqlite.exec(readFileSync(new URL('./fixtures/canonical-crm.sql',import.meta.url),'utf8'));
     for(const file of ['0048_crm_acquisition.sql','0049_crm_canonical_sources.sql','0050_crm_visitors.sql','0051_crm_staff_alerts.sql'])sqlite.exec(readFileSync(new URL(`../../../migrations/d1/${file}`,import.meta.url),'utf8'));
@@ -42,7 +43,7 @@ export function fixture(options:{fullCanonical?:boolean;crm?:boolean}={}) {
   }
   return {sqlite,db,env,call,setFailAudit(value:boolean){failAudit=value;},close(){sqlite.close();}};
 }
-export const signupInput={firstName:'Synthetic',lastName:'Learner',email:'learner@example.test',password:'a strong synthetic password 123',consent:true,consentVersion:'2026-10'};
+export const signupInput={firstName:'Synthetic',lastName:'Learner',email:'learner@example.test',password:'a strong synthetic password 123',phone:'98765 43210',accountType:'student',city:'Jaipur',consent:true,consentVersion:'2026-10'};
 export async function account(f:ReturnType<typeof fixture>,client='ios',email=signupInput.email){
   const result=await f.call('/auth/signup',{body:{...signupInput,email},client,...(client==='web'?{origin:'https://app.example.test'}:{})});
   if(result.response.status!==201)throw new Error(`Fixture signup failed: ${JSON.stringify(result.body)}`);
