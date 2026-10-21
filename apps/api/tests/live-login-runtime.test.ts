@@ -5,6 +5,7 @@ import {DatabaseSync} from 'node:sqlite';
 import {Miniflare,convertV4MiniflareOptions} from 'miniflare';
 import {build} from 'esbuild';
 import {fileURLToPath} from 'node:url';
+import { seededCode, signupInput } from './fixture';
 
 test('real workerd TechlyUpIdentity RPC trusts only deployment binding props and completes one PKCE sign-in',async()=>{
  const root=fileURLToPath(new URL('../../../',import.meta.url));
@@ -17,11 +18,12 @@ test('real workerd TechlyUpIdentity RPC trusts only deployment binding props and
  ]}));
  try{
   const db=await mf.getD1Database('REGISTRATIONS_DB','canonical'),schema=new DatabaseSync(':memory:');
-  try{schema.exec(readFileSync(root+'apps/api/tests/fixtures/canonical.sql','utf8'));for(const name of ['0047_native_app_foundation.sql','0054_account_registration_live_login.sql'])schema.exec(readFileSync(root+'migrations/d1/'+name,'utf8'));
+  try{schema.exec(readFileSync(root+'apps/api/tests/fixtures/canonical.sql','utf8'));for(const name of ['0047_native_app_foundation.sql','0054_account_registration_live_login.sql','0055_passwordless_registration.sql','0056_live_passcodes.sql'])schema.exec(readFileSync(root+'migrations/d1/'+name,'utf8'));
    const objects=schema.prepare("SELECT type,name,sql FROM sqlite_master WHERE sql IS NOT NULL AND name NOT LIKE 'sqlite_%' ORDER BY CASE type WHEN 'table' THEN 0 WHEN 'index' THEN 1 ELSE 2 END,rowid").all() as {type:string;name:string;sql:string}[];for(const item of objects)await db.prepare(item.sql).run();
    for(const item of objects.filter(v=>v.type==='table')){const rows=schema.prepare('SELECT * FROM "'+item.name+'"').all();for(const row of rows){const keys=Object.keys(row);await db.prepare('INSERT INTO "'+item.name+'"('+keys.join(',')+') VALUES('+keys.map(()=>'?').join(',')+')').bind(...keys.map(k=>row[k])).run();}}
   }finally{schema.close();}
-  const session=await mf.dispatchFetch('https://app.example.test/fixture/signup',{method:'POST',body:JSON.stringify({firstName:'Runtime',lastName:'Teacher',email:'runtime@example.invalid',password:'a private runtime password 123',phone:'+919876543210',accountType:'teacher',city:'Jaipur',consent:true,consentVersion:'2026-10'})}).then(r=>r.json()) as any;
+  const issued=seededCode('runtime@example.invalid');await db.prepare(issued.sql).run();
+  const session=await mf.dispatchFetch('https://app.example.test/fixture/signup',{method:'POST',body:JSON.stringify({...signupInput,firstName:'Runtime',lastName:'Teacher',email:'runtime@example.invalid',phone:'+919876543210',accountType:'teacher',teacherRole:'instructor',challengeId:issued.challengeId,code:issued.code,interestIds:[]})}).then(r=>r.json()) as any;
   assert.match(session.accessToken,/^tlu_a_/);assert.equal(session.user.registration.accountType,'teacher');
   const frontend=await mf.getWorker('frontend');
   const verifier='v'.repeat(43),pkceChallenge=Buffer.from(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier))).toString('base64url');
@@ -32,7 +34,7 @@ test('real workerd TechlyUpIdentity RPC trusts only deployment binding props and
   const redirect=new URL(approved.data.redirectUrl);assert.equal(redirect.origin,'https://live.example.test');
   const input={challengeId:begun.data.challengeId,code:redirect.searchParams.get('code'),verifier};
   const identity=await frontend.fetch('https://fixture.test/consume',{method:'POST',body:JSON.stringify(input)}).then(r=>r.json()) as any;
-  assert.deepEqual(identity,{ok:true,data:{accountId:session.user.id,email:'runtime@example.invalid',name:'Runtime Teacher',emailVerified:false,accountType:'teacher'}});
+  assert.deepEqual(identity,{ok:true,data:{accountId:session.user.id,email:'runtime@example.invalid',name:'Runtime Teacher',emailVerified:true,accountType:'teacher'}});
   const replay=await frontend.fetch('https://fixture.test/consume',{method:'POST',body:JSON.stringify(input)}).then(r=>r.json()) as any;
   assert.equal(replay.ok,false);assert.equal(replay.error.code,'live_login_code_invalid');
  }finally{await mf.dispose();}

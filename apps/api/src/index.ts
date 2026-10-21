@@ -1,9 +1,11 @@
 import { z } from 'zod';
-import { analyticsSchema, loginSchema, profileSchema, signupSchema, currentPublicCatalog } from '@techlyup/contracts';
+import { analyticsSchema, loginSchema, otpLoginSchema, otpRequestSchema, profileSchema, signupSchema, currentPublicCatalog } from '@techlyup/contracts';
 import { config, database } from './config';
 import { ApiError, type Env } from './types';
 import { checkOrigin, clientPlatform, failure, jsonBody, secureResponse, success } from './http';
-import { authenticate, login, logout, logoutRefresh, rateLimit, refresh, signup, updateProfile } from './auth/service';
+import { authenticate, login, loginWithCode, logout, logoutRefresh, rateLimit, refresh, signup, updateProfile } from './auth/service';
+import { requestCode } from './auth/otp';
+import { emailConfigured } from './email';
 import { clientSession, refreshCookie, setRefreshCookie } from './auth/cookies';
 import { cleanup } from './maintenance';
 import { handleLearning } from './learning/http';
@@ -37,12 +39,12 @@ async function route(request: Request, env: Env, requestId: string, settings: Re
   if (path === '/api/v1/health' && request.method === 'GET') {
     if (!settings.enabled) return success({status:'disabled',enabled:false},requestId);
     // Staff links arrive with website 0041; without them every account is a learner, so they are reported, not required.
-    const row = await database(env).prepare("SELECT count(*) AS ready,sum(name='live_core_staff_links') AS staff FROM sqlite_master WHERE type='table' AND name IN ('learner_accounts','live_core_staff_links','webinar_erp_roles','app_sessions','app_access_tokens','app_refresh_tokens','app_audit_events','app_analytics_events','app_rate_limits','app_account_registrations','app_live_login_challenges')").first<{ready:number;staff:number}>();
-    if (row?.ready !== 10 + (row?.staff ? 1 : 0)) throw new ApiError('storage_unavailable','App storage is not ready.',503);
+    const row = await database(env).prepare("SELECT count(*) AS ready,sum(name='live_core_staff_links') AS staff FROM sqlite_master WHERE type='table' AND name IN ('learner_accounts','live_core_staff_links','webinar_erp_roles','app_sessions','app_access_tokens','app_refresh_tokens','app_audit_events','app_analytics_events','app_rate_limits','app_account_registrations','app_live_login_challenges','app_email_otp_challenges','app_account_onboarding','app_consent_records','app_live_passcodes')").first<{ready:number;staff:number}>();
+    if (row?.ready !== 14 + (row?.staff ? 1 : 0)) throw new ApiError('storage_unavailable','App storage is not ready.',503);
     if(settings.crm){
       if(!await crmStorageReady(database(env)))throw new ApiError('storage_unavailable','CRM storage is not ready.',503);
     }
-    return success({status:'ready',enabled:true,staffLinks:Boolean(row.staff)},requestId);
+    return success({status:'ready',enabled:true,staffLinks:Boolean(row.staff),emailCodes:emailConfigured(env)},requestId);
   }
   if(path==='/api/v1/crm/preferences/revoke')return (await handleCrmPublic(request,env,requestId,settings))!;
   if(path==='/api/v1/crm/visitor/consent')return (await handleVisitors(request,env,requestId,settings))!;
@@ -77,8 +79,25 @@ async function route(request: Request, env: Env, requestId: string, settings: Re
     const input = signupSchema.parse(await jsonBody(request));
     await rateLimit(db,'signup-ip',clientIp(request),12);
     await rateLimit(db,'signup-email',input.email,5);
+    await rateLimit(db,'otp-verify',input.challengeId,5,600);
     const session = await signup(db,orgId,input,clientPlatform(request),requestId);
     const response = success(clientSession(session,request),requestId,201);
+    if (clientPlatform(request)==='web') setRefreshCookie(response,request,session.refreshToken!);
+    return response;
+  }
+  if (path === '/api/v1/auth/otp' && request.method === 'POST') {
+    const input = otpRequestSchema.parse(await jsonBody(request));
+    if (input.purpose==='signup' && !settings.signup) throw new ApiError('signup_disabled','New app accounts are not enabled in this environment.',503);
+    await rateLimit(db,'otp-ip',clientIp(request),20);
+    await rateLimit(db,'otp-email',input.email,3,600);
+    return success(await requestCode(env,db,input,settings.origins[0]!),requestId,202);
+  }
+  if (path === '/api/v1/auth/otp/login' && request.method === 'POST') {
+    const input = otpLoginSchema.parse(await jsonBody(request));
+    await rateLimit(db,'login-ip',clientIp(request),50);
+    await rateLimit(db,'otp-verify',input.challengeId,5,600);
+    const session = await loginWithCode(db,orgId,input,clientPlatform(request),requestId);
+    const response = success(clientSession(session,request),requestId);
     if (clientPlatform(request)==='web') setRefreshCookie(response,request,session.refreshToken!);
     return response;
   }

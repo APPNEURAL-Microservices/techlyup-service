@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import type { ApiResponse, AuthSession, CrmLead, CrmLeadDetail, CrmTask } from '@techlyup/contracts';
+import { seededCode, signupInput } from './fixture';
 
 const root = fileURLToPath(new URL('../../../', import.meta.url));
 const wrangler = join(root, 'node_modules/wrangler/bin/wrangler.js');
@@ -76,7 +77,7 @@ test('real workerd and canonical D1 support CRM CRUD, current grants, atomic aud
       assert.match(response.headers.get('cache-control')??'',/no-store/);
       return {status:response.status,data:'data' in body?body.data:null,error:'error' in body?body.error.code:null,headers:response.headers};
     }
-    const signup=(email:string)=>call<AuthSession>('/auth/signup',{body:{firstName:'Synthetic',lastName:'CRM Runtime',email,password:'private synthetic CRM runtime password 123',phone:'9876543210',accountType:'student',city:'Jaipur',consent:true,consentVersion:'2026-10'}});
+    const signup=(email:string)=>{const issued=seededCode(email);sql(issued.sql);return call<AuthSession>('/auth/signup',{body:{...signupInput,firstName:'Synthetic',lastName:'CRM Runtime',email,challengeId:issued.challengeId,code:issued.code}});};
     const staff=await signup('crm-runtime-staff@example.invalid'),learner=await signup('crm-runtime-learner@example.invalid');
     assert.equal(staff.status,201);assert.equal(learner.status,201);assert.ok(staff.data?.accessToken);assert.ok(learner.data?.accessToken);
     const access=staff.data!.accessToken,staffId=staff.data!.user.id;

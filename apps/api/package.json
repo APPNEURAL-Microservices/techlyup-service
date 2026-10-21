@@ -16,7 +16,7 @@
     "@appneurox/learning-postgres": "file:../../vendor/appneurox-learning-postgres-0.1.0.tgz",
     "@appneurox/platform-client": "0.1.0",
     "@appneurox/razorpay-invoice-core": "file:../../vendor/appneurox-razorpay-invoice-core-0.1.0.tgz",
-    "@techlyup/contracts": "0.1.2",
+    "@techlyup/contracts": "0.1.4",
     "zod": "^4.6.7"
   },
   "devDependencies": {

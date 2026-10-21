@@ -5,6 +5,8 @@ import { scrypt, timingSafeEqual } from 'node:crypto';
 const WORK = { N: 32768, r: 8, p: 3, maxmem: 64 * 1024 * 1024 } as const;
 const hex = (bytes: Uint8Array) => Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
 export async function hash(value: string) { return hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value)))); }
+/** 256 random bits as hex, for identifiers and secrets that are never shown to anyone. */
+export const randomHex = (bytes = 32) => hex(crypto.getRandomValues(new Uint8Array(bytes)));
 export function opaque(kind: 'a' | 'r') { return `tlu_${kind}_${hex(crypto.getRandomValues(new Uint8Array(32)))}`; }
 export function validToken(value: string, kind: 'a' | 'r') { return new RegExp(`^tlu_${kind}_[a-f0-9]{64}$`).test(value); }
 function derive(password: string, salt: Uint8Array): Promise<Uint8Array> {

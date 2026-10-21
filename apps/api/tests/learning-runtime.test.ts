@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import pg from 'pg';
 import { courseLessons, type AuthSession, type ApiResponse } from '@techlyup/contracts';
+import { seededCode, signupInput } from './fixture';
 
 const root = fileURLToPath(new URL('../../../', import.meta.url));
 const wrangler = join(root, 'node_modules/wrangler/bin/wrangler.js');
@@ -108,7 +109,7 @@ test('real workerd HTTP learning journey persists through PostgreSQL and rejects
       const response = await fetch(`${origin}/api/v1${path}`, { method: options.method ?? (options.body !== undefined ? 'POST' : 'GET'), headers: { 'X-TechlyUp-Client': 'ios', ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}), ...(options.access ? { Authorization: `Bearer ${options.access}` } : {}), ...(options.key ? { 'Idempotency-Key': options.key } : {}) }, ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}), signal: AbortSignal.timeout(10000) });
       const body = await response.json() as ApiResponse<T>; return { status: response.status, body, data: 'data' in body ? body.data : null, error: 'error' in body ? body.error.code : null };
     }
-    const signup = (email: string) => call<AuthSession>('/auth/signup', { body: { firstName: 'Synthetic', lastName: 'HTTP Learner', email, password: 'private synthetic HTTP password 123', phone: '9876543210', accountType: 'student', city: 'Jaipur', consent: true, consentVersion: '2026-10' } });
+    const signup = (email: string) => { const issued = seededCode(email); command(['d1', 'execute', 'REGISTRATIONS_DB', '--local', '--command', issued.sql]); return call<AuthSession>('/auth/signup', { body: { ...signupInput, firstName: 'Synthetic', lastName: 'HTTP Learner', email, challengeId: issued.challengeId, code: issued.code } }); };
     const first = await signup('http-owner@example.invalid'); assert.equal(first.status, 201); assert.ok(first.data?.accessToken);
     const access = first.data!.accessToken, key = randomUUID(), item = { kind: 'course', id: 'course-ai-useful-answers' };
     const enrolled = await call<{ id: string }>('/learning/enrollments', { body: item, access, key }); assert.equal(enrolled.status, 201); assert.ok(enrolled.data?.id);

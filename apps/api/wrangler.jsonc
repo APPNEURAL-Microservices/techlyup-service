@@ -35,7 +35,7 @@
   "triggers": { "crons": ["17 * * * *"] },
   "limits": { "cpu_ms": 30000 },
   "env": {
-    // app.techlyup.com: registration and TechlyUp LIVE sign-in only. Every other capability stays off.
+    // app.techlyup.com: passwordless registration, email-code sign-in and TechlyUp LIVE sign-in only. Every other capability stays off.
     // Canonical learner accounts live in the website's existing D1 (techlyup-site REGISTRATIONS_DB).
     "production": {
       "name": "techlyup-app-api",
@@ -62,8 +62,11 @@
         "APP_CRM_INTEGRATIONS_ENABLED": "false",
         "CRM_ANALYTICS_EXPORT_ENABLED": "false",
         "TECHLYUP_ERP_ORG_ID": "appneural",
-        "APP_ALLOWED_ORIGINS": "https://app.techlyup.com"
+        "APP_ALLOWED_ORIGINS": "https://app.techlyup.com",
+        "EMAIL_FROM": "admin@notify.techlyup.com"
       },
+      // Sign-in codes. Same verified Cloudflare Email Sending sender as TechlyUp LIVE.
+      "send_email": [{ "name": "EMAIL", "allowed_sender_addresses": ["admin@notify.techlyup.com"] }],
       "d1_databases": [{
         "binding": "REGISTRATIONS_DB",
         "database_name": "techlyup-registrations",

@@ -1,6 +1,7 @@
-import type { AccountRegistration, AccountType, AuthSession, ClientPlatform, ProfileInput, SignupInput, UserProfile } from '@techlyup/contracts';
+import type { AccountRegistration, AccountType, AgeGroup, AuthSession, ClientPlatform, OtpLoginInput, PreferredLanguage, ProfileInput, SignupInput, TeacherRole, UserProfile } from '@techlyup/contracts';
 import { ApiError, type D1Database } from '../types';
-import { DUMMY_HASH, hash, hashPassword, opaque, validToken, verifyPassword } from './crypto';
+import { DUMMY_HASH, hash, hashPassword, opaque, randomHex, validToken, verifyPassword } from './crypto';
+import { consumeCode, invalidCode } from './otp';
 import { authority } from './permissions';
 
 export const ACCESS_SECONDS = 15 * 60;
@@ -25,8 +26,12 @@ function jsonIds(raw: string) {
   return value as string[];
 }
 export async function accountRegistration(db: D1Database, accountId: string): Promise<AccountRegistration | undefined> {
-  const row = await db.prepare('SELECT account_type,phone,city,referral_code FROM app_account_registrations WHERE account_id=?').bind(accountId).first<{ account_type: AccountType; phone: string; city: string; referral_code: string }>();
-  return row ? { accountType: row.account_type, phone: row.phone, city: row.city, referralCode: row.referral_code } : undefined;
+  const row = await db.prepare(`SELECT r.account_type,r.phone,r.city,r.referral_code,o.teacher_role,o.preferred_language,o.institution,o.age_group
+    FROM app_account_registrations r LEFT JOIN app_account_onboarding o ON o.account_id=r.account_id WHERE r.account_id=?`).bind(accountId)
+    .first<{ account_type: AccountType; phone: string; city: string; referral_code: string; teacher_role: TeacherRole | null; preferred_language: PreferredLanguage | null; institution: string | null; age_group: AgeGroup | null }>();
+  return row ? { accountType: row.account_type, phone: row.phone, city: row.city, referralCode: row.referral_code,
+    ...(row.teacher_role ? { teacherRole: row.teacher_role } : {}), ...(row.preferred_language ? { preferredLanguage: row.preferred_language } : {}),
+    ...(row.institution ? { institution: row.institution } : {}), ...(row.age_group ? { ageGroup: row.age_group } : {}) } : undefined;
 }
 export async function userProfile(db: D1Database, orgId: string, row: AccountRow, now = new Date()): Promise<UserProfile> {
   const registration = await accountRegistration(db, row.id);
@@ -66,29 +71,57 @@ function sessionStatements(db: D1Database, c: Awaited<ReturnType<typeof credenti
     audit(db,c.accountId,c.sessionId,action,requestId,c.createdAt),
   ];
 }
+function consent(db: D1Database, accountId: string, purpose: 'account_terms' | 'webinar_updates' | 'guardian', version: string, granted: boolean, requestId: string, now: string) {
+  return db.prepare('INSERT INTO app_consent_records(id,account_id,purpose,version,granted,request_id,created_at) VALUES(?,?,?,?,?,?,?)').bind(crypto.randomUUID(),accountId,purpose,version,granted ? 1 : 0,requestId,now);
+}
+/**
+ * Passwordless. The email code proves the address, so the account starts verified. The canonical column still requires a
+ * password hash; it holds the hash of a random secret nobody knows, so password sign-in cannot succeed for this account.
+ */
 export async function signup(db: D1Database, orgId: string, input: SignupInput, client: ClientPlatform, requestId: string, now = new Date()): Promise<AuthSession> {
-  const id = `acct_${crypto.randomUUID()}`, password = await hashPassword(input.password), c = await credentials(id,password,client,now);
+  const id = `acct_${crypto.randomUUID()}`, password = await hashPassword(randomHex()), c = await credentials(id,password,client,now);
+  const interests = JSON.stringify(input.interestIds);
   const row: AccountRow = { id, email: input.email, name: `${input.firstName} ${input.lastName}`, first_name: input.firstName, middle_name: null, last_name: input.lastName,
-    email_verified: 0, password_hash: password, audience_ids: '[]', goal_ids: '[]', interest_ids: '[]' };
+    email_verified: 1, password_hash: password, audience_ids: '[]', goal_ids: '[]', interest_ids: interests };
   // Resolve required canonical role tables before any write, including for a new learner.
   const user = await userProfile(db,orgId,row,now);
   const referrer = input.referralCode ? await db.prepare('SELECT account_id FROM app_account_registrations WHERE referral_code=?').bind(input.referralCode).first<{ account_id: string }>() : null;
   if (input.referralCode && !referrer) throw new ApiError('validation_failed', 'Check the supplied details.', 422, { referralCode: 'This referral code is not valid. Check it or leave it empty.' });
+  const unavailable = () => new ApiError('account_unavailable', 'Unable to create an account with these details. Try signing in.', 409);
+  // Checked before the code is spent, so fixing a referral or signing in instead does not need a new email.
+  if (await db.prepare('SELECT 1 AS found FROM learner_accounts WHERE email=?').bind(input.email).first()) throw unavailable();
+  await consumeCode(db,'signup',input.email,input.challengeId,input.code,now);
+  const onboarding = [id,input.teacherRole ?? null,input.preferredLanguage,input.institution ?? null,input.ageGroup,input.guardianName ?? null,input.guardianEmail ?? null,input.ageGroup === 'minor' ? c.createdAt : null,c.createdAt,c.createdAt];
   for (let attempt = 1; ; attempt++) {
-    const registration: AccountRegistration = { accountType: input.accountType, phone: input.phone, city: input.city, referralCode: referralCode() };
+    const registration: AccountRegistration = { accountType: input.accountType, ...(input.teacherRole ? { teacherRole: input.teacherRole } : {}), phone: input.phone, city: input.city, referralCode: referralCode(),
+      preferredLanguage: input.preferredLanguage, ...(input.institution ? { institution: input.institution } : {}), ageGroup: input.ageGroup };
     try {
       await db.batch([
-        db.prepare('INSERT INTO learner_accounts(id,email,name,first_name,last_name,password_hash,consent_version,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,input.email,row.name,input.firstName,input.lastName,password,input.consentVersion,c.createdAt,c.createdAt),
+        db.prepare('INSERT INTO learner_accounts(id,email,name,first_name,last_name,password_hash,email_verified,interest_ids,consent_version,created_at,updated_at) VALUES(?,?,?,?,?,?,1,?,?,?,?)').bind(id,input.email,row.name,input.firstName,input.lastName,password,interests,input.consentVersion,c.createdAt,c.createdAt),
         db.prepare('INSERT INTO app_account_registrations(account_id,phone,account_type,city,referral_code,referred_by_account_id,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)').bind(id,registration.phone,registration.accountType,registration.city,registration.referralCode,referrer?.account_id ?? null,c.createdAt,c.createdAt),
+        db.prepare('INSERT INTO app_account_onboarding(account_id,teacher_role,preferred_language,institution,age_group,guardian_name,guardian_email,guardian_consent_at,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)').bind(...onboarding),
+        consent(db,id,'account_terms',input.consentVersion,true,requestId,c.createdAt),
+        consent(db,id,'webinar_updates',input.consentVersion,input.updatesConsent,requestId,c.createdAt),
+        ...(input.ageGroup === 'minor' ? [consent(db,id,'guardian',input.consentVersion,true,requestId,c.createdAt)] : []),
         ...sessionStatements(db,c,'auth.signup',requestId),
       ]);
       return { user: { ...user, registration }, accessToken: c.accessToken, refreshToken: c.refreshToken, expiresIn: ACCESS_SECONDS };
     } catch (error) {
-      if (error instanceof Error && /UNIQUE constraint failed: learner_accounts.email/.test(error.message)) throw new ApiError('account_unavailable', 'Unable to create an account with these details. Try signing in.', 409);
+      if (error instanceof Error && /UNIQUE constraint failed: learner_accounts.email/.test(error.message)) throw unavailable();
       if (attempt < 3 && error instanceof Error && /UNIQUE constraint failed: app_account_registrations.referral_code/.test(error.message)) continue;
       throw error;
     }
   }
+}
+/** Works for every canonical account, including website-created ones: the code proves control of the account's email. */
+export async function loginWithCode(db: D1Database, orgId: string, input: OtpLoginInput, client: ClientPlatform, requestId: string, now = new Date()): Promise<AuthSession> {
+  await consumeCode(db,'login',input.email,input.challengeId,input.code,now);
+  const row = await db.prepare('SELECT * FROM learner_accounts WHERE email=?').bind(input.email).first<AccountRow>();
+  if (!row) throw invalidCode();
+  const user = await userProfile(db,orgId,row,now), c = await credentials(row.id,row.password_hash,client,now);
+  // Audited as auth.login: the 0047 audit table only accepts its original actions.
+  await db.batch(sessionStatements(db,c,'auth.login',requestId));
+  return { user, accessToken: c.accessToken, refreshToken: c.refreshToken, expiresIn: ACCESS_SECONDS };
 }
 export async function login(db: D1Database, orgId: string, email: string, password: string, client: ClientPlatform, requestId: string, now = new Date()): Promise<AuthSession> {
   const row = await db.prepare('SELECT * FROM learner_accounts WHERE email=?').bind(email).first<AccountRow>();

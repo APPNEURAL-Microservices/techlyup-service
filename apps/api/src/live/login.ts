@@ -5,6 +5,7 @@ import { database } from '../config';
 import { hash } from '../auth/crypto';
 import { accountRegistration, authenticate, rateLimit, type Identity } from '../auth/service';
 import { jsonBody, success } from '../http';
+import { handleLivePasscodeHttp } from './passcode';
 
 /** Sign-in to TechlyUp LIVE with an app account: LIVE starts a PKCE challenge over its service binding,
  * the learner approves it on this origin, and LIVE redeems the one-use code with its verifier. */
@@ -19,14 +20,14 @@ function secureUrl(env: Env, value: string | undefined) {
   if (url.username || url.password || url.search || url.hash || (url.protocol !== 'https:' && !loopback(env, url))) throw unavailable();
   return url;
 }
-function liveLoginDatabase(env: LiveLoginEnv) {
+export function liveLoginDatabase(env: LiveLoginEnv) {
   if (env.APP_ENABLED !== 'true' || env.APP_LIVE_LOGIN_ENABLED !== 'true' || !env.LIVE_LOGIN_CLIENT_ID || !env.TECHLYUP_ERP_ORG_ID) throw unavailable();
   const app = secureUrl(env, env.LIVE_LOGIN_APP_ORIGIN);
   if (app.origin !== env.LIVE_LOGIN_APP_ORIGIN || !(env.APP_ALLOWED_ORIGINS ?? '').split(',').map(value => value.trim()).includes(app.origin)) throw unavailable();
   return { db: database(env), appOrigin: app.origin, callback: secureUrl(env, env.LIVE_LOGIN_CALLBACK_URL) };
 }
 // Caller scope comes only from operator-managed binding props, never from request input.
-function caller(env: LiveLoginEnv, props: LiveLoginProps | undefined) {
+export function caller(env: LiveLoginEnv, props: LiveLoginProps | undefined) {
   const setup = liveLoginDatabase(env);
   if (props?.clientId !== env.LIVE_LOGIN_CLIENT_ID || props?.product !== 'techlyup' || props?.tenantId !== env.TECHLYUP_ERP_ORG_ID) throw new ApiError('live_login_caller_denied', 'This service binding is not authorized for TechlyUp LIVE sign-in.', 403);
   return { ...setup, client: props.clientId };
@@ -80,6 +81,8 @@ export async function consumeLiveLogin(env: LiveLoginEnv, props: LiveLoginProps 
 }
 
 export async function handleLiveLoginHttp(request: Request, env: LiveLoginEnv, requestId: string, clientIp: string) {
+  const passcode = await handleLivePasscodeHttp(request, env, requestId);
+  if (passcode) return passcode;
   if (new URL(request.url).pathname !== '/api/v1/live/sign-in/authorize' || request.method !== 'POST') return null;
   const { db } = liveLoginDatabase(env);
   await rateLimit(db, 'live-login-authorize-ip', clientIp, 60);

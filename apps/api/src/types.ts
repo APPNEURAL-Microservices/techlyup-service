@@ -22,6 +22,9 @@ export interface Env extends CrmEnv {
   PLATFORM_API_ORIGIN?: string; PLATFORM_SERVICE_CREDENTIAL?: string;
   PLATFORM_TENANT_ID?: string; PLATFORM_PROJECT_ID?: string; PLATFORM_ENVIRONMENT_ID?: string;
   REGISTRATIONS_DB?: D1Database; ASSETS?: { fetch(request: Request): Promise<Response> };
+  /** Cloudflare Email Sending binding for sign-in codes, with its verified sender address. */
+  EMAIL?: { send(message: { from: { email: string; name: string }; to: string; subject: string; text: string }): Promise<{ messageId?: string } | undefined> };
+  EMAIL_FROM?: string;
 }
 export class ApiError extends Error {
   constructor(public code: string, message: string, public status = 400, public fields?: Record<string, string>) { super(message); }

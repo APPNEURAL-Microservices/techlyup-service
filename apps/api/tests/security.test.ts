@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { scryptSync } from 'node:crypto';
 import test from 'node:test';
-import { account,fixture,signupInput } from './fixture';
+import { account,codeLogin,emailCode,fixture,signupInput } from './fixture';
 import { fetch } from '../src/index';
 import { hash } from '../src/auth/crypto';
 
@@ -17,11 +17,11 @@ test('native signup/me/logout shares canonical account identity and stores only 
   const f=fixture();try{
     const {body,response}=await account(f);const session=body.data;
     assert.match(session.accessToken,/^tlu_a_[a-f0-9]{64}$/);assert.match(session.refreshToken,/^tlu_r_[a-f0-9]{64}$/);
-    assert.equal(session.user.emailVerified,false);assert.deepEqual(session.user.roles,['learner']);assert.deepEqual(session.user.permissions,[]);
+    assert.equal(session.user.emailVerified,true);assert.deepEqual(session.user.roles,['learner']);assert.deepEqual(session.user.permissions,[]);
     assert.equal(response.headers.get('set-cookie'),null);
     assert.match(response.headers.get('cache-control')??'',/no-store/);
     const stored=JSON.stringify({session:f.sqlite.prepare('SELECT * FROM app_sessions').get(),access:f.sqlite.prepare('SELECT * FROM app_access_tokens').get(),refresh:f.sqlite.prepare('SELECT * FROM app_refresh_tokens').get()});
-    assert.equal(stored.includes(session.accessToken),false);assert.equal(stored.includes(session.refreshToken),false);assert.equal(stored.includes(signupInput.password),false);
+    assert.equal(stored.includes(session.accessToken),false);assert.equal(stored.includes(session.refreshToken),false);
     const me=await f.call('/me',{access:session.accessToken});assert.equal(me.response.status,200);assert.equal(me.body.data.id,session.user.id);
     const loggedOut=await f.call('/auth/logout',{body:{},access:session.accessToken});assert.equal(loggedOut.response.status,200);
     assert.equal((await f.call('/me',{access:session.accessToken})).response.status,401);
@@ -32,12 +32,15 @@ test('native signup/me/logout shares canonical account identity and stores only 
 
 test('canonical website-format password hashes log in without creating or replacing users',async()=>{
   const f=fixture();try{
-    const salt=Buffer.alloc(24,3),password=scryptSync(signupInput.password,salt,32,{N:32768,r:8,p:3,maxmem:64*1024*1024});
+    const secret='a strong synthetic password 123',salt=Buffer.alloc(24,3),password=scryptSync(secret,salt,32,{N:32768,r:8,p:3,maxmem:64*1024*1024});
     const stored=`scrypt$32768$8$3$${salt.toString('hex')}$${Buffer.from(password).toString('hex')}`,id=`acct_${crypto.randomUUID()}`;
     f.sqlite.prepare('INSERT INTO learner_accounts(id,email,name,password_hash,consent_version,created_at,updated_at) VALUES(?,?,?,?,?,?,?)').run(id,signupInput.email,'Canonical Learner',stored,'2026-10','2026-01-01','2026-01-01');
     f.sqlite.prepare('INSERT INTO learner_account_sessions(token_hash,account_id,expires_at,created_at) VALUES(?,?,?,?)').run('canonical-website-session-hash',id,'2099-01-01','2026-01-01');
-    const result=await f.call('/auth/login',{body:{email:signupInput.email.toUpperCase(),password:signupInput.password}});
+    const result=await f.call('/auth/login',{body:{email:signupInput.email.toUpperCase(),password:secret}});
     assert.equal(result.response.status,200);assert.equal(result.body.data.user.id,id);
+    // An email code reaches the same canonical account and leaves its website password untouched.
+    const byCode=await codeLogin(f);assert.equal(byCode.response.status,200);assert.equal(byCode.body.data.user.id,id);
+    assert.equal(f.sqlite.prepare('SELECT password_hash p FROM learner_accounts WHERE id=?').get(id)?.p,stored);
     assert.equal(f.sqlite.prepare('SELECT count(*) n FROM learner_accounts').get()?.n,1);
     assert.equal(f.sqlite.prepare('SELECT token_hash FROM learner_account_sessions').get()?.token_hash,'canonical-website-session-hash');
   }finally{f.close();}
@@ -62,7 +65,7 @@ test('web refresh uses an HttpOnly host cookie, exact origin and no refresh secr
 test('refresh rotation rejects replay and revokes that family without revoking another device',async()=>{
   const f=fixture();try{
     const first=(await account(f)).body.data;
-    const other=(await f.call('/auth/login',{client:'android',body:{email:signupInput.email,password:signupInput.password}})).body.data;
+    const other=(await codeLogin(f,signupInput.email,'android')).body.data;
     const rotated=await f.call('/auth/refresh',{body:{refreshToken:first.refreshToken}});assert.equal(rotated.response.status,200);
     const replay=await f.call('/auth/refresh',{body:{refreshToken:first.refreshToken}});assert.equal(replay.response.status,401);assert.equal(replay.body.error.code,'refresh_replayed');
     assert.equal((await f.call('/me',{access:rotated.body.data.accessToken})).response.status,401);
@@ -130,7 +133,7 @@ test('profile writes validate taxonomy, reject identity/role injection and roll 
 test('failed audit persistence rolls back signup and refresh token changes',async()=>{
   const f=fixture();try{
     f.setFailAudit(true);
-    const denied=await f.call('/auth/signup',{body:signupInput});assert.equal(denied.response.status,503);
+    const denied=await f.call('/auth/signup',{body:{...signupInput,...await emailCode(f,signupInput.email)}});assert.equal(denied.response.status,503);
     assert.equal(f.sqlite.prepare('SELECT count(*) n FROM learner_accounts').get()?.n,0);assert.equal(f.sqlite.prepare('SELECT count(*) n FROM app_sessions').get()?.n,0);
     f.setFailAudit(false);const session=(await account(f)).body.data;f.setFailAudit(true);
     const failed=await f.call('/auth/refresh',{body:{refreshToken:session.refreshToken}});assert.equal(failed.response.status,503);
@@ -147,8 +150,9 @@ test('request body bounds, exact schemas, CORS allowlist and rate limits fail cl
     const goodOrigin=await f.call('/catalog',{origin:'https://app.example.test'});assert.equal(goodOrigin.response.headers.get('access-control-allow-origin'),'https://app.example.test');
     const key=await hash(`signup-email:${signupInput.email}:${Math.floor(Date.now()/3600000)}`);
     f.sqlite.prepare('INSERT INTO app_rate_limits(id,expires_at,count) VALUES(?,?,?)').run(key,'2099-01-01',5);
-    const limited=await f.call('/auth/signup',{body:signupInput});assert.equal(limited.response.status,429);assert.ok(limited.response.headers.get('retry-after'));
-    f.sqlite.exec('DROP TABLE app_rate_limits');assert.equal((await f.call('/auth/signup',{body:{...signupInput,email:'other@example.test'}})).response.status,503);
+    const unissued={challengeId:`otp_${'0'.repeat(32)}`,code:'000000'};
+    const limited=await f.call('/auth/signup',{body:{...signupInput,...unissued}});assert.equal(limited.response.status,429);assert.ok(limited.response.headers.get('retry-after'));
+    f.sqlite.exec('DROP TABLE app_rate_limits');assert.equal((await f.call('/auth/signup',{body:{...signupInput,email:'other@example.test',...unissued}})).response.status,503);
     assert.equal(f.sqlite.prepare('SELECT count(*) n FROM learner_accounts').get()?.n,0);
   }finally{f.close();}
 });

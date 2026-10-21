@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { ApiError } from '../types';
 import type { RpcResult } from '../credits/types';
 import { beginLiveLogin, consumeLiveLogin, type LiveLoginEnv, type LiveLoginProps } from './login';
+import { accountForVerifiedEmail, verifyLivePasscode } from './passcode';
 export async function liveLoginResult<T>(work: () => Promise<T>): Promise<RpcResult<T>> {
   try { return { ok: true, data: await work() }; }
   catch (error) {
@@ -16,4 +17,6 @@ export async function liveLoginResult<T>(work: () => Promise<T>): Promise<RpcRes
 export class TechlyUpIdentity extends WorkerEntrypoint<LiveLoginEnv, LiveLoginProps> {
   beginLiveLogin(input: { pkceChallenge: string }) { return liveLoginResult(() => beginLiveLogin(this.env, this.ctx.props, input)); }
   consumeLiveLogin(input: { challengeId: string; code: string; verifier: string }) { return liveLoginResult(() => consumeLiveLogin(this.env, this.ctx.props, input)); }
+  verifyLivePasscode(input: { loginId: string; passcode: string }) { return liveLoginResult(() => verifyLivePasscode(this.env, this.ctx.props, input)); }
+  accountForVerifiedEmail(input: { email: string }) { return liveLoginResult(() => accountForVerifiedEmail(this.env, this.ctx.props, input)); }
 }
