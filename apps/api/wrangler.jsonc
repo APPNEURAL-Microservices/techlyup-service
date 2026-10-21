@@ -9,6 +9,7 @@
   "vars": {
     "APP_ENV": "development",
     "APP_ENABLED": "false",
+    "APP_PRODUCTS_ENABLED": "false",
     "APP_SUPPORT_CREDITS_ENABLED": "false",
     "APP_SUPPORT_TEST_PAYMENTS_ENABLED": "false",
     "APP_SIGNUP_ENABLED": "false",
@@ -45,6 +46,7 @@
       "vars": {
         "APP_ENV": "production",
         "APP_ENABLED": "true",
+        "APP_PRODUCTS_ENABLED": "false",
         "APP_SIGNUP_ENABLED": "true",
         "APP_LIVE_LOGIN_ENABLED": "true",
         "LIVE_LOGIN_CLIENT_ID": "techlyup-live",

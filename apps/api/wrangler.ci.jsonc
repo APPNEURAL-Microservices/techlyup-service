@@ -10,6 +10,7 @@
   "vars": {
     "APP_ENV": "test",
     "APP_ENABLED": "false",
+    "APP_PRODUCTS_ENABLED": "false",
     "APP_SUPPORT_CREDITS_ENABLED": "false",
     "APP_SUPPORT_TEST_PAYMENTS_ENABLED": "false",
     "APP_SIGNUP_ENABLED": "false",

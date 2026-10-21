@@ -21,6 +21,7 @@ import {handleSupportHttp,supportLinkPage} from './credits/http';
 import {processSupportFunding} from './credits/payments';
 import {processWebinarCrmIntake} from './crm/webinar-ingestion';
 import {handleLiveLoginHttp} from './live/login';
+import {handleProductsHttp} from './products/identity';
 
 const refreshSchema = z.object({ refreshToken: z.string().max(100).optional() }).strict();
 const clientIp = (request: Request) => request.headers.get('cf-connecting-ip') ?? 'local';
@@ -53,6 +54,8 @@ async function route(request: Request, env: Env, requestId: string, settings: Re
   if(supportResponse)return supportResponse;
   const liveLoginResponse=await handleLiveLoginHttp(request,env,requestId,clientIp(request));
   if(liveLoginResponse)return liveLoginResponse;
+  const productsResponse=await handleProductsHttp(request,env,requestId,clientIp(request));
+  if(productsResponse)return productsResponse;
   const db = database(env), orgId = env.TECHLYUP_ERP_ORG_ID!;
   if(path.startsWith('/api/v1/crm/')){
     const visitorResponse=await handleVisitors(request,env,requestId,settings);

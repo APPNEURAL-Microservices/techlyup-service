@@ -8,6 +8,8 @@ export interface D1Statement {
 export interface D1Database { prepare(sql: string): D1Statement; batch(statements: D1Statement[]): Promise<D1Result[]> }
 import type { CrmEnv } from './crm/providers';
 export interface Env extends CrmEnv {
+  APP_PRODUCTS_ENABLED?: string; APP_PRODUCTS_APP_ORIGIN?: string; APP_PRODUCTS_LOCAL_ORIGINS?: string;
+  STUDIO_DATABASE_URL?: string; STUDIO_HYPERDRIVE?: { connectionString: string };
   APP_ENV?: string; APP_ENABLED?: string; APP_SIGNUP_ENABLED?: string;
   APP_ANALYTICS_ENABLED?: string; APP_LEARNING_ENABLED?: string;
   APP_PLATFORM_ENABLED?: string;

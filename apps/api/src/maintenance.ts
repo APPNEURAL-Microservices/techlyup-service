@@ -13,4 +13,8 @@ export async function cleanup(env:Env,now=new Date()) {
     db.prepare('DELETE FROM app_live_login_challenges WHERE id IN(SELECT id FROM app_live_login_challenges WHERE expires_at<=? ORDER BY expires_at,id LIMIT 1000)').bind(retained),
     db.prepare('DELETE FROM app_email_otp_challenges WHERE id IN(SELECT id FROM app_email_otp_challenges WHERE expires_at<=? ORDER BY expires_at,id LIMIT 1000)').bind(retained),
   ]);
+  if(env.APP_PRODUCTS_ENABLED==='true')await db.batch([
+    db.prepare('DELETE FROM app_product_login_challenges WHERE id IN(SELECT id FROM app_product_login_challenges WHERE expires_at<=? ORDER BY expires_at,id LIMIT 1000)').bind(retained),
+    db.prepare('DELETE FROM app_product_sessions WHERE id IN(SELECT id FROM app_product_sessions WHERE expires_at<=? ORDER BY expires_at,id LIMIT 1000)').bind(retained),
+  ]);
 }

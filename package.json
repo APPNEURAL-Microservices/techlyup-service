@@ -10,6 +10,8 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "tsx --test --test-concurrency=1 apps/api/tests/*.test.ts packages/platform-client/tests/*.test.ts",
     "test:native-bridge": "node scripts/test-native-bridge.mjs",
+    "qa:studio:runtime": "node scripts/qa-studio-runtime.mjs",
+    "qa:studio:api": "node scripts/qa-studio-api.mjs",
     "build": "npm run build -w @techlyup/api",
     "db:local": "npm run db:local -w @techlyup/api",
     "contracts:pack": "npm pack -w @techlyup/contracts --pack-destination vendor"
