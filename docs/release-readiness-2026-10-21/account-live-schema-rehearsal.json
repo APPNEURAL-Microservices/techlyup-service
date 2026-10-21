@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-21",
+  "scope": "Offline in-memory rehearsal using a current production schema-only export and synthetic local records. No production writes, deployments, DNS changes, messages or providers.",
+  "schemaSha256": "9659acd6a446cd0d2aaa357862bcb762fc57aaa4598326533f9b1a8868d65647",
+  "migrations": [
+    {
+      "name": "0047_native_app_foundation.sql",
+      "sha256": "0682b383ada7bfd91fe9e5f3eb1d07b42ca7e683c1e72fb8b89f884fce149d98"
+    },
+    {
+      "name": "0054_account_registration_live_login.sql",
+      "sha256": "8287e779d14f1d79dd4b2318f0f7cc26b230ff124e7c2e39441cae7f53f8d1a8"
+    }
+  ],
+  "migrationLedger": "Only selected app0047+0054 receipts; a second apply skipped both. Website0037-0046 and optional app0048-0053 were not applied.",
+  "addedTables": [
+    "app_access_tokens",
+    "app_account_registrations",
+    "app_analytics_events",
+    "app_audit_events",
+    "app_live_login_challenges",
+    "app_rate_limits",
+    "app_refresh_tokens",
+    "app_sessions"
+  ],
+  "checks": {
+    "inputContainsNoRecords": true,
+    "migrationLedgerReapplySkipsBoth": true,
+    "existingSchemaObjectsUnchanged": true,
+    "onlyEightAccountLiveTablesAdded": true,
+    "crmSupportLearningTablesAdded": false,
+    "healthReady": true,
+    "staffLinksPresent": false,
+    "signupCanonicalLearnerOnly": true,
+    "browserRefreshIsPrivateSecureCookie": true,
+    "cookieRestoreKeepsCanonicalIdentity": true,
+    "learnerCannotBecomeAdmin": true,
+    "livePkceCanonicalIdentityAndReplayProtection": true,
+    "logoutRevokesAppAccess": true,
+    "freshLoginKeepsCanonicalIdentity": true,
+    "foreignKeysValidAfterJourneys": true
+  },
+  "result": "pass"
+}

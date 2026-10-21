@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-21",
+  "scope": "Actual isolated local Workerd HTTP using synthetic local web signup and two simultaneously submitted copies of one refresh cookie; no production/provider operation.",
+  "signupStatus": 201,
+  "concurrentRefreshStatuses": [
+    200,
+    401
+  ],
+  "winnerAccessStatusAfterReplay": 401,
+  "serverReplayProtection": "one rotation succeeds; duplicated consumed refresh revokes the family",
+  "clientAcceptance": "client must serialize cookie refresh across tabs; server policy remains unchanged"
+}

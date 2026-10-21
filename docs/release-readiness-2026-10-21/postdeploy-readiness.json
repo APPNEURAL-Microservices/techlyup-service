@@ -1,0 +1,112 @@
+{
+  "date": "2026-10-21",
+  "scope": "Read-only production schema/deployment/config metadata only. No user records, credentials, cookie values or secrets were read or copied. No production mutation performed by verifier.",
+  "capturedAt": "2026-10-20T19:40:36.224Z",
+  "canonicalDatabase": {
+    "name": "techlyup-registrations",
+    "requiredTableCount": 8,
+    "requiredTables": [
+      "app_access_tokens",
+      "app_account_registrations",
+      "app_analytics_events",
+      "app_audit_events",
+      "app_live_login_challenges",
+      "app_rate_limits",
+      "app_refresh_tokens",
+      "app_sessions"
+    ],
+    "requiredTablesPresent": true,
+    "addedTablesComparedWithPredeploymentSchema": [
+      "app_access_tokens",
+      "app_account_registrations",
+      "app_analytics_events",
+      "app_audit_events",
+      "app_live_login_challenges",
+      "app_rate_limits",
+      "app_refresh_tokens",
+      "app_sessions"
+    ],
+    "unexpectedAddedTables": [],
+    "optionalModuleTableAdditions": 0,
+    "requiredIndexes": [
+      {
+        "name": "app_access_session",
+        "table": "app_access_tokens"
+      },
+      {
+        "name": "app_account_registrations_referrer",
+        "table": "app_account_registrations"
+      },
+      {
+        "name": "app_analytics_created",
+        "table": "app_analytics_events"
+      },
+      {
+        "name": "app_audit_account",
+        "table": "app_audit_events"
+      },
+      {
+        "name": "app_live_login_challenges_client",
+        "table": "app_live_login_challenges"
+      },
+      {
+        "name": "app_rate_limits_expiry",
+        "table": "app_rate_limits"
+      },
+      {
+        "name": "app_refresh_session",
+        "table": "app_refresh_tokens"
+      },
+      {
+        "name": "app_sessions_account",
+        "table": "app_sessions"
+      }
+    ],
+    "requiredIndexCount": 8,
+    "migrationLedgerCount": 38,
+    "requiredMigrationReceipts": [
+      "0047_native_app_foundation.sql",
+      "0054_account_registration_live_login.sql"
+    ],
+    "foreignKeyViolationCount": 0,
+    "quickCheck": "ok",
+    "verificationRowsWritten": 0
+  },
+  "appWorker": {
+    "name": "techlyup-app-api",
+    "deploymentId": "e19ef186-dfaf-4d60-a9b0-63cc1143343c",
+    "versions": [
+      {
+        "version_id": "3ee7db77-3763-4ee5-a8d4-fd422c480b32",
+        "percentage": 100
+      }
+    ],
+    "optionalFlags": {
+      "APP_SUPPORT_CREDITS_ENABLED": "false",
+      "APP_SUPPORT_TEST_PAYMENTS_ENABLED": "false",
+      "APP_ANALYTICS_ENABLED": "false",
+      "APP_LEARNING_ENABLED": "false",
+      "APP_PLATFORM_ENABLED": "false",
+      "APP_CRM_ENABLED": "false",
+      "APP_CRM_CAPTURE_ENABLED": "false",
+      "APP_CRM_WEBINAR_ENABLED": "false",
+      "APP_CRM_SENDING_ENABLED": "false",
+      "APP_CRM_INTEGRATIONS_ENABLED": "false",
+      "CRM_ANALYTICS_EXPORT_ENABLED": "false"
+    },
+    "allOptionalFlagsDisabled": true
+  },
+  "websiteWorker": {
+    "name": "techlyup-site",
+    "deploymentId": "b68f6ada-4fb0-47c8-b090-9dba2acf153d",
+    "versions": [
+      {
+        "version_id": "da99dbf6-4f1b-4126-afd2-3ca10efcfdf6",
+        "percentage": 100
+      }
+    ],
+    "expectedUnchangedVersion": "da99dbf6-4f1b-4126-afd2-3ca10efcfdf6",
+    "unchanged": true
+  },
+  "result": "pass"
+}

@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-21",
+  "scope": "Read-only Cloudflare metadata; no production user records queried or copied and no production mutation.",
+  "sourceCommit": "e29f795",
+  "worker": {
+    "name": "techlyup-app-api",
+    "exists": false,
+    "deploymentListResult": "Cloudflare10007: Worker does not exist",
+    "secretNameListResult": "Worker not found",
+    "requiredBackendSecretNamesForAccountLive": []
+  },
+  "canonicalDatabase": {
+    "name": "techlyup-registrations",
+    "id": "e98173f2-34c9-4b47-b36c-755d2bf775dd",
+    "metadataReadRowsWritten": 0,
+    "migrationLedgerCount": 36,
+    "lastMigration": "0036_webinargg_integration.sql",
+    "requiredCanonicalTablesPresent": ["learner_accounts", "webinar_erp_roles"],
+    "staffLinksPresent": false,
+    "appTablesPresent": [],
+    "canonicalNameFieldsPresent": ["first_name", "middle_name", "last_name"],
+    "schemaOnlySha256": "9659acd6a446cd0d2aaa357862bcb762fc57aaa4598326533f9b1a8868d65647"
+  },
+  "minimumMigrations": ["0047_native_app_foundation.sql", "0054_account_registration_live_login.sql"],
+  "website0037Through0046RequiredForAccountLive": false,
+  "productionMigrationPerformed": false,
+  "productionDeploymentPerformed": false,
+  "productionDnsChangePerformed": false
+}
