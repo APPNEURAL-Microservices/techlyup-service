@@ -1,0 +1,20 @@
+{
+  "generator": "nestjs-fleet/scripts/service_packages.py",
+  "slug": "techlyup-service",
+  "files": {
+    "packages/README.md": "33c44fff13758a28936b4cf67a19d711838d9db07b7846ff864b1d1648d49f08",
+    "packages/sdk/README.md": "d1d3c48613f3c14aa50a35aeff76cf32c52ab961f9c7efc86833cb2acb7a8b92",
+    "packages/sdk/package.json": "667ecb46c0305e1e3c6f6e09471ff187c7ddbfc560d22e84d325880cda62b622",
+    "packages/sdk/src/index.ts": "4bf07005fbf8851406796698ec35bd81378f7751b5886f70849ec0b6a6630225",
+    "packages/sdk/tsconfig.json": "858d627cf8e72085680aa29bea2721d296081e83f10c5ed111726b0831ce794e",
+    "packages/service/README.md": "f17ae24f72a9e1093345d5b1eaa67766712174c58b56747780de0043a2549c75",
+    "packages/service/package.json": "f329fd4b1203aea7d7f319de6c0ef4d50907775cf7b7cc0a59c9c433bd7c45f3",
+    "packages/service/src/application.ts": "4ef45f1c3d659220eb2ffb53c4412df267bcb7092688999f053fc12c5fc7ac82",
+    "packages/service/src/controller.ts": "c843e12836934a9d3627d81741580c5aa6139f8aabfd51fe19a6c85cb2221521",
+    "packages/service/src/definition.ts": "d58d99f3cb9f0a141e67a49a60959886b6b4d14824771b0da0f544877d335cba",
+    "packages/service/src/index.ts": "a01354c8a3a8c099090d73be0ec5b3b5dbe2aedb9d133e8c7b9bf980ba0f0965",
+    "packages/service/src/module.ts": "c3d84ca39bdb044a8c607fb9a7e556e7bbc68bfc448fbf564aadaf8bff5b8caa",
+    "packages/service/src/standalone.ts": "e42e0bd02e6f88bef59e8106ceb5ba72df4709ee10c9c72002d329700e4ac089",
+    "packages/service/tsconfig.json": "8fe1fbe5cc735d5722d27d967083f51a32eef4f265f38a990858f893f37fcc03"
+  }
+}
