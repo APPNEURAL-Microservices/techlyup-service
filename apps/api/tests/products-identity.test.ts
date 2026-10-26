@@ -27,8 +27,9 @@ test('product SSO keeps fixed destinations, validates deployment caller and deni
   const f=await setup();try{
     const c=await challenge(f),metadata=await productLoginRequest(f.env,f.identity,c.begun.challengeId);
     assert.equal(c.begun.authorizeUrl,'https://app.example.test/products/sign-in?challengeId='+c.begun.challengeId);
-    assert.equal(new URL(c.approved.redirectUrl).origin,'https://courses.techlyup.com');
-    assert.equal(new URL(c.approved.redirectUrl).pathname,'/api/auth/callback');assert.equal(metadata.appName,'Courses');assert.equal(metadata.returnPath,'/curriculum');
+    assert.equal(new URL(c.approved.redirectUrl).origin,'https://app.example.test');
+    assert.equal(new URL(c.approved.redirectUrl).pathname,'/studio/courses/api/auth/callback');assert.equal(metadata.appName,'Courses');assert.equal(metadata.returnPath,'/curriculum');
+    assert.equal(metadata.appOrigin,'https://app.example.test/studio/courses');
     for(const wrong of [undefined,{...props,clientId:'unapproved'},{...props,tenantId:'another-tenant'},{...props,product:'foreign'}])await assert.rejects(beginProductLogin(f.env,wrong as ProductBindingProps,{pkceChallenge:'a'.repeat(43)}),code('product_caller_denied'));
     for(const path of ['//attacker.example','/%2fattacker.example','/\\attacker.example','https://attacker.example','/api/auth/techlyup/callback','/%0aevil'])await assert.rejects(beginProductLogin(f.env,props,{pkceChallenge:'a'.repeat(43),returnPath:path}),code('product_return_invalid'));
     await assert.rejects(beginProductLogin(f.env,props,{pkceChallenge:'a'.repeat(43),callback:'https://attacker.example'} as any));
@@ -87,14 +88,14 @@ test('audit failure atomically rolls redemption back and logout is idempotent',a
     await assert.rejects(productSession(f.env,props,input),code('product_session_invalid'));
   }finally{f.close();}
 });
-test('local origins are explicit and production cannot enable loopback or arbitrary central origins',async()=>{
+test('every app is served below the central origin and production cannot use loopback or another central origin',async()=>{
   const f=await setup();try{
-    f.env.APP_PRODUCTS_LOCAL_ORIGINS=JSON.stringify({courses:'http://127.0.0.1:18921'});
-    assert.equal(productConfiguration(f.env).destinations.courses,'http://127.0.0.1:18921');
-    f.env.APP_PRODUCTS_LOCAL_ORIGINS=JSON.stringify({courses:'http://127.0.0.1:18922'});assert.throws(()=>productConfiguration(f.env),code('products_unavailable'));
-    f.env.APP_PRODUCTS_LOCAL_ORIGINS=JSON.stringify({courses:'https://attacker.example'});assert.throws(()=>productConfiguration(f.env),code('products_unavailable'));
-    f.env.APP_PRODUCTS_LOCAL_ORIGINS='{}';f.env.APP_ENV='production';assert.throws(()=>productConfiguration(f.env),code('products_unavailable'));
-    delete f.env.APP_PRODUCTS_LOCAL_ORIGINS;f.env.APP_ALLOWED_ORIGINS='https://app.techlyup.com';assert.equal(productConfiguration(f.env).appOrigin,'https://app.techlyup.com');
+    f.env.APP_ALLOWED_ORIGINS='http://127.0.0.1:8788';
+    assert.equal(productConfiguration(f.env).destinations.courses,'http://127.0.0.1:8788/studio/courses');
+    assert.equal(productConfiguration(f.env).destinations.assistant,'http://127.0.0.1:8788/studio/assistant');
+    f.env.APP_ENV='production';assert.throws(()=>productConfiguration(f.env),code('products_unavailable'));
+    f.env.APP_ALLOWED_ORIGINS='https://attacker.example';assert.throws(()=>productConfiguration(f.env),code('products_unavailable'));
+    f.env.APP_ALLOWED_ORIGINS='https://app.techlyup.com';assert.equal(productConfiguration(f.env).destinations.courses,'https://app.techlyup.com/studio/courses');
     f.env.APP_PRODUCTS_ENABLED='false';assert.throws(()=>productConfiguration(f.env),code('products_unavailable'));
   }finally{f.close();}
 });

@@ -7,9 +7,13 @@ export interface D1Statement {
 }
 export interface D1Database { prepare(sql: string): D1Statement; batch(statements: D1Statement[]): Promise<D1Result[]> }
 import type { CrmEnv } from './crm/providers';
-export interface Env extends CrmEnv {
-  APP_PRODUCTS_ENABLED?: string; APP_PRODUCTS_APP_ORIGIN?: string; APP_PRODUCTS_LOCAL_ORIGINS?: string;
-  STUDIO_DATABASE_URL?: string; STUDIO_HYPERDRIVE?: { connectionString: string };
+import type { StudioAppBinding } from './products/gateway';
+/** Each separate Studio app Worker, reached through a service binding by the /studio/<app> gateway. */
+type StudioApps = Partial<Record<StudioAppBinding, { fetch(request: Request): Promise<Response> }>>;
+export interface Env extends CrmEnv, StudioApps {
+  APP_PRODUCTS_ENABLED?: string; APP_PRODUCTS_APP_ORIGIN?: string;
+  /** Dedicated D1 for private Studio drafts; never the canonical registrations store. */
+  STUDIO_DB?: D1Database;
   APP_ENV?: string; APP_ENABLED?: string; APP_SIGNUP_ENABLED?: string;
   APP_ANALYTICS_ENABLED?: string; APP_LEARNING_ENABLED?: string;
   APP_PLATFORM_ENABLED?: string;

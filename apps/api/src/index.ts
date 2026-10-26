@@ -22,6 +22,7 @@ import {processSupportFunding} from './credits/payments';
 import {processWebinarCrmIntake} from './crm/webinar-ingestion';
 import {handleLiveLoginHttp} from './live/login';
 import {handleProductsHttp} from './products/identity';
+import {routeStudioApp} from './products/gateway';
 
 const refreshSchema = z.object({ refreshToken: z.string().max(100).optional() }).strict();
 const clientIp = (request: Request) => request.headers.get('cf-connecting-ip') ?? 'local';
@@ -174,6 +175,8 @@ export async function fetch(request: Request, env: Env): Promise<Response> {
   if(supportPage)return supportPage;
   if (!new URL(request.url).pathname.startsWith('/api/')) {
     if(env.APP_ENV==='production'&&new URL(request.url).protocol!=='https:')return new Response('HTTPS is required.',{status:403});
+    const studio=await routeStudioApp(request,env);
+    if(studio)return studio;
     if (env.ASSETS) {
       const response = await env.ASSETS.fetch(request);
       const headers = new Headers(response.headers);

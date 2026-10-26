@@ -30,8 +30,26 @@
     "database_name": "techlyup-app-local-only",
     "database_id": "00000000-0000-0000-0000-000000000000",
     "migrations_dir": "../../migrations/d1"
+  }, {
+    // Private Studio drafts only. A dedicated database, never the canonical registrations store.
+    "binding": "STUDIO_DB",
+    "database_name": "techlyup-studio-local-only",
+    "database_id": "00000000-0000-0000-0000-000000000001",
+    "migrations_dir": "../../migrations/studio"
   }],
-  "assets": { "directory": "public", "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*", "/support/link"] },
+  // /studio/<app>/* reaches the gateway, which forwards released apps to their own Workers
+  // and otherwise returns this app's page from ASSETS (src/products/gateway.ts).
+  "services": [
+    { "binding": "STUDIO_COURSES", "service": "techlyup-courses" },
+    { "binding": "STUDIO_MENTORSHIP", "service": "techlyup-mentorship" },
+    { "binding": "STUDIO_CERTIFICATES", "service": "techlyup-certificates" },
+    { "binding": "STUDIO_LEARNERS", "service": "techlyup-learners" },
+    { "binding": "STUDIO_EARNINGS", "service": "techlyup-earnings" },
+    { "binding": "STUDIO_PROMOTION", "service": "techlyup-promotion" },
+    { "binding": "STUDIO_INSIGHTS", "service": "techlyup-insights" },
+    { "binding": "STUDIO_ASSISTANT", "service": "techlyup-assistant" }
+  ],
+  "assets": { "directory": "public", "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*", "/support/link", "/studio/*"] },
   "observability": { "enabled": true },
   "triggers": { "crons": ["17 * * * *"] },
   "limits": { "cpu_ms": 30000 },

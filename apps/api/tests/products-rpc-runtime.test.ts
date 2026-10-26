@@ -36,9 +36,9 @@ test('real workerd product RPC completes app-bound PKCE and rechecks the parent 
   for(const path of ['/begin-none','/begin-wrong']){const denied=await call(path,{pkceChallenge});assert.equal(denied.ok,false);assert.equal(denied.error.code,'product_caller_denied');}
   const begun=await call('/begin',{pkceChallenge,returnPath:'/curriculum'});assert.equal(begun.ok,true);
   const metadata=await mf.dispatchFetch('https://app.example.test/api/v1/products/sign-in/request?challengeId='+begun.data.challengeId,{headers:{authorization:'Bearer '+session.accessToken}}).then(r=>r.json()) as any;
-  assert.equal(metadata.data.appName,'Courses');assert.equal(metadata.data.appOrigin,'https://courses.techlyup.com');
+  assert.equal(metadata.data.appName,'Courses');assert.equal(metadata.data.appOrigin,'https://app.example.test/studio/courses');
   const approved=await mf.dispatchFetch('https://app.example.test/api/v1/products/sign-in/authorize',{method:'POST',headers:{authorization:'Bearer '+session.accessToken,'content-type':'application/json'},body:JSON.stringify({challengeId:begun.data.challengeId})}).then(r=>r.json()) as any;
-  const redirect=new URL(approved.data.redirectUrl);assert.equal(redirect.origin,'https://courses.techlyup.com');
+  const redirect=new URL(approved.data.redirectUrl);assert.equal(redirect.origin,'https://app.example.test');assert.equal(redirect.pathname,'/studio/courses/api/auth/callback');
   const input={challengeId:begun.data.challengeId,code:redirect.searchParams.get('code'),verifier};
   assert.equal((await call('/consume-other',input)).ok,false);
   const signed=await call('/consume',input);assert.equal(signed.ok,true);assert.equal(signed.data.user.id,session.user.id);assert.equal(signed.data.returnPath,'/curriculum');

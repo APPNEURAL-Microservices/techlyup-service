@@ -4,6 +4,27 @@ import { readFileSync } from 'node:fs';
 import type { D1Database, D1Statement, Env } from '../src/types';
 import { fetch } from '../src/index';
 
+/** A D1 binding over in-memory SQLite: batches are one transaction, as in D1. */
+export function sqliteD1(sqlite:DatabaseSync,beforeRun:(sql:string)=>void=()=>{}):D1Database{
+  class Statement implements D1Statement {
+    constructor(readonly sql:string,readonly values:unknown[] = []){}
+    bind(...values:unknown[]){return new Statement(this.sql,values);}
+    execute() {
+      beforeRun(this.sql);
+      const result=sqlite.prepare(this.sql).run(...this.values as (string|number|null)[]);
+      return {meta:{changes:Number(result.changes)}};
+    }
+    async first<T>(){return (sqlite.prepare(this.sql).get(...this.values as (string|number|null)[])??null) as T|null;}
+    async all<T>(){return {results:sqlite.prepare(this.sql).all(...this.values as (string|number|null)[]) as T[]};}
+    async run(){return this.execute();}
+  }
+  return {prepare:sql=>new Statement(sql),async batch(statements){
+    sqlite.exec('BEGIN IMMEDIATE');
+    try {const result=statements.map(statement=>(statement as Statement).execute());sqlite.exec('COMMIT');return result;}
+    catch(error){sqlite.exec('ROLLBACK');throw error;}
+  }};
+}
+
 export function fixture(options:{fullCanonical?:boolean;crm?:boolean}={}) {
   const sqlite = new DatabaseSync(':memory:');
   sqlite.exec(readFileSync(new URL(options.fullCanonical?'./fixtures/website-schema-2026-10-16.sql':'./fixtures/canonical.sql',import.meta.url),'utf8'));
@@ -18,23 +39,7 @@ export function fixture(options:{fullCanonical?:boolean;crm?:boolean}={}) {
   let failAudit = false;
   // Synthetic Cloudflare Email Sending binding. Messages stay in memory and are never printed.
   const outbox:{to:string;subject:string;text:string}[]=[];
-  class Statement implements D1Statement {
-    constructor(readonly sql:string,readonly values:unknown[] = []){}
-    bind(...values:unknown[]){return new Statement(this.sql,values);}
-    execute() {
-      if(failAudit && /INSERT INTO app_audit_events/.test(this.sql))throw new Error('synthetic private audit storage failure');
-      const result=sqlite.prepare(this.sql).run(...this.values as (string|number|null)[]);
-      return {meta:{changes:Number(result.changes)}};
-    }
-    async first<T>(){return (sqlite.prepare(this.sql).get(...this.values as (string|number|null)[])??null) as T|null;}
-    async all<T>(){return {results:sqlite.prepare(this.sql).all(...this.values as (string|number|null)[]) as T[]};}
-    async run(){return this.execute();}
-  }
-  const db:D1Database={prepare:sql=>new Statement(sql),async batch(statements){
-    sqlite.exec('BEGIN IMMEDIATE');
-    try {const result=statements.map(statement=>(statement as Statement).execute());sqlite.exec('COMMIT');return result;}
-    catch(error){sqlite.exec('ROLLBACK');throw error;}
-  }};
+  const db=sqliteD1(sqlite,sql=>{if(failAudit && /INSERT INTO app_audit_events/.test(sql))throw new Error('synthetic private audit storage failure');});
   const env:Env={APP_ENV:'test',APP_ENABLED:'true',APP_SIGNUP_ENABLED:'true',APP_ANALYTICS_ENABLED:'false',APP_ALLOWED_ORIGINS:'https://app.example.test',TECHLYUP_ERP_ORG_ID:'appneural',REGISTRATIONS_DB:db,
     EMAIL_FROM:'codes@example.test',EMAIL:{async send(message){outbox.push({to:message.to,subject:message.subject,text:message.text});return {messageId:`synthetic-${outbox.length}`};}}};
   async function call(path:string, options:{method?:string;body?:unknown;access?:string;client?:string;origin?:string|null;cookie?:string;headers?:Record<string,string>}={}){

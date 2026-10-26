@@ -1,30 +1,31 @@
 # Private product workspace storage
 
-This additive schema is for the eight separate TechlyUp apps. It contains private
+This schema is for the eight separate TechlyUp Studio apps. It holds private
 teacher preparation drafts and external canonical account references. It does not
 copy identity/password records or replace `learning-service` enrollment/progress.
 
-`0001_owned_workspace.sql` creates four tables in `studio_workspace`. All four
-enable **and force** owner/org row security. The application refuses superuser
-and `BYPASSRLS` connections. Use a dedicated restricted Studio runtime role and
-Hyperdrive binding; never reuse the learning runtime role or migration owner.
+It lives in a dedicated Cloudflare D1 database (`techlyup-studio`, binding
+`STUDIO_DB`), never in the canonical `techlyup-registrations` store.
+`0001_studio_workspace.sql` creates four tables, two indexes and three triggers.
 
-Apply this migration to an isolated local database first. Review backups,
-compatibility and target identity before any separately authorized production
-migration. No startup path runs migrations and no deployment enables the feature.
-Production requires `STUDIO_HYPERDRIVE`; direct `STUDIO_DATABASE_URL` accepts only
-loopback development/test connections. `APP_PRODUCTS_ENABLED` defaults off.
+D1 has no row-level security. Every repository statement binds the
+server-resolved owner (`org_id`, `issuer`, `account_id`) and filters or writes it;
+`studio-repository.test.ts` fails if a statement touches a Studio table without
+it. Triggers keep a draft's owner, app and resource fixed and stop audit events and
+stored change responses from being rewritten. Drafts can still be deleted, so
+later export/deletion workflows remain possible.
 
-After creating a reviewed runtime role with `NOSUPERUSER NOBYPASSRLS NOCREATEDB
-NOCREATEROLE`, substitute its name in `runtime-grants.sql` and apply those grants
-with the migration owner. The runtime receives no schema ownership, deletion,
-audit editing, role administration or other database privileges.
+Apply this migration to a local database first. Review backups, compatibility
+and the target before any separately authorized production migration. No startup
+path runs migrations and no deployment enables the feature. `APP_PRODUCTS_ENABLED`
+defaults off.
 
-Every mutation uses one database transaction for the draft, audit event and
-idempotency response. Version conflicts return 409. A lost response can be
-retried using the same UUID change key and identical payload. Changed content
-with the same key returns 409. Archived drafts remain stored, leave active
-listings and cannot be edited through the API.
+Every change is one atomic D1 batch: the draft, its audit event and the change
+key's stored response. The audit and response rows are written only if that
+exact draft write landed, identified by its `write_id`. Version conflicts return
+409. A lost response can be retried using the same UUID change key and identical
+payload. Changed content with the same key returns 409. Archived drafts remain
+stored, leave active listings and cannot be edited through the API.
 
 The initial release supports 22 typed draft resources. All changes remain drafts.
 Official issuance, live course publication, confirmed appointment scheduling,
@@ -34,11 +35,13 @@ canonical ownership, permissions and provider integrations are accepted.
 Insights counts only this account's actual saved preparation records; it never
 derives earnings, attendance, credentials or teaching results from those drafts.
 
-Validation: `npx tsx --test apps/api/tests/studio-repository.test.ts` starts and
-destroys its own loopback `*_ci` PostgreSQL cluster, migrates it and uses a role
-without RLS bypass. It verifies all editable resources, persistence across a
-fresh pool, cross-account/org isolation, direct SQL RLS, concurrent version and
-idempotency behavior, audit rollback, archive behavior and honest feature gates.
+Validation: `npx tsx --test apps/api/tests/studio-repository.test.ts` checks the
+owner key in every statement, then exercises all editable resources on in-memory
+SQLite and on actual workerd D1 through Miniflare: persistence, cross-account/org
+isolation, concurrent version and idempotency behavior, audit rollback, the
+schema triggers, archive behavior and honest feature gates.
+`npx wrangler d1 migrations apply STUDIO_DB --local` applies the file through
+Wrangler's own statement splitter.
 
 Rollback: switch `APP_PRODUCTS_ENABLED` off in a separately reviewed release.
 Keep schema/data intact. Do not drop tables or reverse this additive migration

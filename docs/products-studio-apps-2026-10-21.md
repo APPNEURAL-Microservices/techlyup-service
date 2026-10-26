@@ -6,6 +6,13 @@ Assistant. Their UIs and serving Workers belong to `Desktop/TechlyUp-App/apps/`.
 Home and Account stay in the central app. The existing LIVE sign-in flow and
 public website remain separate.
 
+> **25 October update.** The apps are now served at `https://app.techlyup.com/studio/<app>`
+> by the central Worker's gateway instead of separate subdomains, so callbacks go to
+> `/studio/<app>/api/auth/callback` and approval continues automatically for a signed-in
+> person. Studio storage moved from PostgreSQL to a dedicated D1 (`STUDIO_DB`). See
+> [studio-path-gateway-release.md](studio-path-gateway-release.md). Destination and PostgreSQL
+> details below are historical.
+
 ## Release boundary
 
 No production migration, deployment, domain activation, payment, external

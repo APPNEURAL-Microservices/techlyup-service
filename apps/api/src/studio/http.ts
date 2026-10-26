@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { ApiError } from '../types';
+import { ApiError, type D1Database } from '../types';
 import { definitionFor } from './definitions';
-import { createStudioDatabase, StudioRepository } from './repository';
+import { StudioRepository } from './repository';
 import { validateValues } from './validation';
 import type { StudioActor, StudioEnv, StudioRequest, StudioResponse, StudioUser, WorkspaceCapabilities, WorkspaceResource } from './contracts';
 
@@ -13,14 +13,8 @@ export function canWriteOwnDrafts(user: StudioUser): boolean {
   return user.registration?.accountType === 'teacher' || Boolean(user.roles?.some(role => TEACHING_ROLES.has(role)));
 }
 
-export function studioConnection(env: StudioEnv): string {
-  if (env.STUDIO_HYPERDRIVE?.connectionString) return env.STUDIO_HYPERDRIVE.connectionString;
-  if (['development', 'test'].includes(env.APP_ENV ?? 'development') && env.STUDIO_DATABASE_URL) {
-    try {
-      const address = new URL(env.STUDIO_DATABASE_URL);
-      if (['postgres:', 'postgresql:'].includes(address.protocol) && ['localhost', '127.0.0.1', '[::1]'].includes(address.hostname) && !address.search && !address.hash) return env.STUDIO_DATABASE_URL;
-    } catch { /* Sanitized configuration message below. */ }
-  }
+export function studioStorage(env: StudioEnv): D1Database {
+  if (env.STUDIO_DB) return env.STUDIO_DB;
   throw new ApiError('storage_unavailable', 'Studio storage is not configured. A dedicated database and accepted migrations are required.', 503);
 }
 
@@ -60,17 +54,17 @@ export async function handleStudioRequest(env: StudioEnv, appId: string, user: S
     if (path === '/' && method === 'GET') return { status: 200, body: { definition, capabilities: capabilities('disabled', user) } };
     throw new ApiError('feature_disabled', 'Persistent Studio workspaces are not enabled in this environment.', 503);
   }
-  let connection: string;
-  try { connection = studioConnection(env); }
+  let storage: D1Database;
+  try { storage = studioStorage(env); }
   catch (error) {
     if (path === '/' && method === 'GET') return { status: 200, body: { definition, capabilities: capabilities('unavailable', user) } };
     throw error;
   }
   const actor: StudioActor = { orgId: env.TECHLYUP_ERP_ORG_ID, accountId: user.id, issuer: 'techlyup-learner' };
-  const pool = createStudioDatabase(connection), repository = new StudioRepository(pool);
+  const repository = new StudioRepository(storage);
   try {
     if (path === '/' && method === 'GET') {
-      try { await repository.ready(actor); return { status: 200, body: { definition, capabilities: capabilities('ready', user) } }; }
+      try { await repository.ready(); return { status: 200, body: { definition, capabilities: capabilities('ready', user) } }; }
       catch { return { status: 200, body: { definition, capabilities: capabilities('unavailable', user) } }; }
     }
     if (method !== 'GET' && !canWriteOwnDrafts(user)) throw new ApiError('forbidden', 'A teaching workspace is required to save your own preparation drafts.', 403);
@@ -108,5 +102,5 @@ export async function handleStudioRequest(env: StudioEnv, appId: string, user: S
     if (error instanceof ApiError) throw error;
     // No raw SQL error, draft values, request body or connection details escape.
     throw new ApiError('storage_unavailable', 'Workspace storage is unavailable. Reload before retrying a change.', 503);
-  } finally { await pool.end().catch(() => undefined); }
+  }
 }

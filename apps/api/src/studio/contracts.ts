@@ -1,3 +1,4 @@
+import type { D1Database } from '../types';
 export const PRODUCT_IDS = ['courses', 'mentorship', 'certificates', 'learners', 'earnings', 'promotion', 'insights', 'assistant'] as const;
 export type ProductId = typeof PRODUCT_IDS[number];
 export type WorkspaceValue = string | number | boolean;
@@ -35,10 +36,8 @@ export interface StudioUser {
 }
 export interface StudioEnv {
   APP_ENV?: string; APP_PRODUCTS_ENABLED?: string; TECHLYUP_ERP_ORG_ID?: string;
-  /** Direct connections are accepted only for loopback development/test databases. */
-  STUDIO_DATABASE_URL?: string;
-  /** A dedicated Studio Hyperdrive binding; never falls back to learning storage. */
-  STUDIO_HYPERDRIVE?: { connectionString: string };
+  /** A dedicated Studio D1; never the canonical registrations or learning storage. */
+  STUDIO_DB?: D1Database;
 }
 export interface StudioActor { orgId: string; accountId: string; issuer: 'techlyup-learner' }
 export interface StudioRequest { method: string; path: string; body?: unknown; idempotencyKey?: string }

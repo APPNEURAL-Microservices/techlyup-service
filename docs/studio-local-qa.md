@@ -1,17 +1,16 @@
 # Separate app local acceptance
 
-The local harness starts the central account Worker on `127.0.0.1:8788` and the
-eight separate app Workers on ports `18921` through `18928` in this order:
-Courses, Mentorship, Certificates, Learners, Earnings, Promotion, Insights,
-AI Assistant. All calls use the actual `TechlyUpProducts` service binding with
-fixed operator-owned app/tenant props, real PKCE and app-specific HttpOnly cookies.
+The local harness starts the central account Worker on `127.0.0.1:8788` with the
+eight separate app Workers behind its gateway at `/studio/<app>`, exactly as in
+production: Courses, Mentorship, Certificates, Learners, Earnings, Promotion,
+Insights, AI Assistant. All calls use the actual `STUDIO_<APP>` and
+`TechlyUpProducts` service bindings with fixed operator-owned app/tenant props,
+real PKCE and app-specific HttpOnly cookies.
 
-Requirements: Node 24+, installed backend and frontend dependencies, local
-`initdb`, `pg_ctl` and `createdb`, and all nine ports free. The harness refuses
-occupied ports and never stops an existing server. It initializes its own
-loopback `techlyup_studio_browser_ci` PostgreSQL cluster, applies the additive
-Studio migration, creates a restricted runtime role, and builds an isolated D1
-schema from checked-in canonical fixtures and migrations through `0057`.
+Requirements: Node 24+, installed backend and frontend dependencies and port 8788
+free. The harness refuses an occupied port and never stops an existing server. It
+creates a disposable Studio D1 from `migrations/studio` and builds an isolated
+canonical D1 schema from checked-in fixtures and migrations through `0057`.
 No remote database, production identity or external provider is used.
 
 Prepare the frontend in the separate TechlyUp app checkout:
@@ -60,15 +59,16 @@ The sanitized receipt is `test-results/studio-apps-20261021/api-acceptance.json`
 Tests keep tokens and private connection strings in memory/private temporary
 files and do not print them.
 
-Browser acceptance should additionally check the real central approval screen,
+Browser acceptance should additionally check the central approval step (it continues
+automatically for a signed-in person), opening an app from the central Studio page,
 each separate app's default/subpages, create/edit/archive/search, reload,
 keyboard focus, desktop/phone menu, accurate empty/error states and the disabled
 canonical actions. Coordinate teacher/learner fixture switches when sharing a
-browser profile. Port numbers do not isolate browser cookies; local app cookies
-are deliberately named per app.
+browser profile. All apps share one origin; their cookies are named per app and
+the gateway forwards each app only its own.
 
-Stop with Ctrl-C or SIGTERM. The harness disposes Miniflare, stops only its own
-PostgreSQL cluster and removes private temporary storage. It marks the status
+Stop with Ctrl-C or SIGTERM. The harness disposes Miniflare, with its D1 data,
+and removes private temporary storage. It marks the status
 receipt stopped. Re-run from clean fixtures for a new acceptance session.
 The harness owns its process termination signals and keeps Node alive until
 disposal, private-file removal and the stopped receipt finish. Miniflare's

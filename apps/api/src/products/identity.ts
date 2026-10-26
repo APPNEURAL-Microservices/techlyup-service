@@ -36,18 +36,8 @@ export function productConfiguration(env: Env) {
   const local=['test','development'].includes(env.APP_ENV??'development');
   const loopback=app.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(app.hostname);
   if(app.origin!==raw||!origins.includes(app.origin)||app.username||app.password||(!local&&app.origin!=='https://app.techlyup.com')||(app.protocol!=='https:'&&!(local&&loopback)))throw unavailable();
-  const destinations=Object.fromEntries(productIds.map(id=>[id,`https://${id}.techlyup.com`])) as Record<ProductId,string>;
-  if(env.APP_PRODUCTS_LOCAL_ORIGINS){
-    if(!local)throw unavailable();
-    let overrides:unknown;try{overrides=JSON.parse(env.APP_PRODUCTS_LOCAL_ORIGINS);}catch{throw unavailable();}
-    if(!overrides||typeof overrides!=='object'||Array.isArray(overrides))throw unavailable();
-    for(const [key,value] of Object.entries(overrides)){
-      if(!productIds.includes(key as ProductId)||typeof value!=='string')throw unavailable();
-      let origin:URL;try{origin=new URL(value);}catch{throw unavailable();}
-      if(origin.origin!==value||origin.username||origin.password||origin.protocol!=='http:'||!['localhost','127.0.0.1','[::1]'].includes(origin.hostname)||origin.port!==String(18921+productIds.indexOf(key as ProductId)))throw unavailable();
-      destinations[key as ProductId]=origin.origin;
-    }
-  }
+  // Every app is served below /studio/<app> on this central origin by its own Worker (see gateway.ts).
+  const destinations=Object.fromEntries(productIds.map(id=>[id,`${app.origin}/studio/${id}`])) as Record<ProductId,string>;
   return {db:database(env),appOrigin:app.origin,destinations,tenantId:env.TECHLYUP_ERP_ORG_ID};
 }
 export function productCaller(env:Env,props:ProductBindingProps|undefined){
@@ -89,7 +79,7 @@ export async function authorizeProductLogin(env:Env,identity:Identity,id:string)
   const {db,row,destinations}=await challenge(env,id,identity),at=clock(),code=randomHex();
   const changed=await db.prepare(`UPDATE app_product_login_challenges SET authorized_account_id=?,authorized_session_id=?,code_hash=?,authorized_at=? WHERE id=? AND client_id=? AND expires_at>? AND consumed_at IS NULL AND attempts<5 AND (authorized_account_id IS NULL OR authorized_account_id=?)`).bind(identity.user.id,identity.sessionId,await hash(code),at,row.id,row.client_id,at,identity.user.id).run();
   if(changed.meta.changes!==1)throw invalidCode();
-  const redirect=new URL('/api/auth/callback',destinations[row.app_id]);
+  const redirect=new URL(`${destinations[row.app_id]}/api/auth/callback`);
   redirect.searchParams.set('challengeId',row.id);redirect.searchParams.set('code',code);
   return {redirectUrl:redirect.href,appName:names[row.app_id],accountDisplay:identity.user.name};
 }

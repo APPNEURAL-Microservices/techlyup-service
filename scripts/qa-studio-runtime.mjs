@@ -2,25 +2,23 @@ import {Miniflare,convertV4MiniflareOptions,Log,LogLevel} from 'miniflare';
 import {build} from 'esbuild';
 import {DatabaseSync} from 'node:sqlite';
 import {mkdtemp,mkdir,readFile,writeFile,rm,stat} from 'node:fs/promises';
-import {spawnSync} from 'node:child_process';
 import {createServer} from 'node:net';
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {randomUUID} from 'node:crypto';
-import pg from 'pg';
 
 const backend=fileURLToPath(new URL('../',import.meta.url));
 const frontend=resolve(process.env.TECHLYUP_APPS_ROOT||resolve(backend,'../../../TechlyUp-App'));
 const output=join(backend,'test-results/studio-apps-20261021');
 const ids=['courses','mentorship','certificates','learners','earnings','promotion','insights','assistant'];
 const appOrigin='http://127.0.0.1:8788';
-const localOrigins=Object.fromEntries(ids.map((id,index)=>[id,`http://127.0.0.1:${18921+index}`]));
+// Every app is served by its own Worker through the central gateway, as in production.
+const productUrls=Object.fromEntries(ids.map(id=>[id,`${appOrigin}/studio/${id}`]));
 const qaSecret=randomUUID().replaceAll('-','');
 const teacherPath=`/__local_qa_${qaSecret}/teacher`;
 const learnerPath=`/__local_qa_${qaSecret}/learner`;
-const run=(program,args)=>{if(spawnSync(program,args,{encoding:'utf8',timeout:30000}).status!==0)throw new Error('private_fixture_command_failed');};
 const freePort=async(port=0)=>new Promise((resolve,reject)=>{const server=createServer();server.once('error',reject);server.listen(port,'127.0.0.1',()=>{const address=server.address();server.close(()=>resolve(address.port));});});
-const buildOptions={bundle:true,write:false,format:'esm',platform:'node',target:'es2022',mainFields:['module','main'],conditions:['workerd'],external:['cloudflare:*','node:*','pg-native'],banner:{js:"import { createRequire as __runtimeCreateRequire } from 'node:module'; const require = __runtimeCreateRequire('/worker.js');"}};
+const buildOptions={bundle:true,write:false,format:'esm',platform:'node',target:'es2022',mainFields:['module','main'],conditions:['workerd'],external:['cloudflare:*','node:*'],banner:{js:"import { createRequire as __runtimeCreateRequire } from 'node:module'; const require = __runtimeCreateRequire('/worker.js');"}};
 // Live file-backed ASSETS equivalent avoids caching stale export hashes while
 // the user-facing local QA build is being rebuilt by the parent task.
 const assetsFor=(directory,spa)=>async request=>{
@@ -34,14 +32,12 @@ const assetsFor=(directory,spa)=>async request=>{
  }
  return new Response('Local exported page was not found.',{status:404});
 };
-let temporary,started=false,mf,owner;
+let temporary,mf;
 let cleanupPromise,shutdownTimer;
 function cleanup(){
  if(cleanupPromise)return cleanupPromise;
  cleanupPromise=(async()=>{
-  if(started){run('pg_ctl',['-D',join(temporary,'data'),'-m','fast','-w','stop']);started=false;}
   if(mf)await mf.dispose();
-  if(owner)await owner.end().catch(()=>{});
   if(temporary)await rm(temporary,{recursive:true,force:true});
   await writeFile(join(output,'runtime-status.json'),JSON.stringify({ready:false,stoppedAt:new Date().toISOString()},null,2),{mode:0o600});
  })();
@@ -62,34 +58,20 @@ function ownShutdownSignals(){
 ownShutdownSignals();
 try{
  await mkdir(output,{recursive:true});
- for(const port of [8788,...ids.map((_,index)=>18921+index)])await freePort(port);
+ await freePort(8788);
  for(const id of ids)await stat(join(frontend,'apps',id,'dist/client/index.html'));
  await stat(join(frontend,'apps/mobile/dist/products/sign-in.html'));
  temporary=await mkdtemp('/tmp/techlyup-studio-browser-');
- const data=join(temporary,'data'),port=await freePort(),ownerPassword=randomUUID().replaceAll('-',''),runtimePassword=randomUUID().replaceAll('-','');
- const passwordFile=join(temporary,'owner-password');await writeFile(passwordFile,ownerPassword,{mode:0o600});
- run('initdb',['-D',data,'--no-locale','-E','UTF8','--auth-local=trust','--auth-host=scram-sha-256','--pwfile',passwordFile,'-U','studio_qa_owner']);
- run('pg_ctl',['-D',data,'-l',join(temporary,'server.log'),'-o',`-h 127.0.0.1 -p ${port} -k ${temporary}`,'-w','start']);started=true;
- run('createdb',['-h',temporary,'-p',String(port),'-U','studio_qa_owner','techlyup_studio_browser_ci']);
- owner=new pg.Client({host:temporary,port,user:'studio_qa_owner',database:'techlyup_studio_browser_ci'});owner.on('error',()=>{});await owner.connect();
- await owner.query(await readFile(join(backend,'migrations/studio/0001_owned_workspace.sql'),'utf8'));
- await owner.query(`CREATE ROLE studio_qa_runtime LOGIN PASSWORD '${runtimePassword}' NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE`);
- await owner.query((await readFile(join(backend,'migrations/studio/runtime-grants.sql'),'utf8')).replaceAll('studio_workspace_runtime','studio_qa_runtime'));
- const runtimeUrl=new URL(`postgresql://127.0.0.1:${port}/techlyup_studio_browser_ci`);runtimeUrl.username='studio_qa_runtime';runtimeUrl.password=runtimePassword;
- // The local-only handoff file contains the ephemeral restricted DSN, never credentials in tool output.
- await writeFile(join(temporary,'.dev.vars'),`STUDIO_DATABASE_URL=${JSON.stringify(runtimeUrl.href)}\n`,{mode:0o600});
  const wrapper=`
 export {TechlyUpProducts} from './apps/api/src/products/rpc.ts';
 import central from './apps/api/src/index.ts';
 import {hash,randomHex} from './apps/api/src/auth/crypto.ts';
-import {createStudioDatabase,StudioRepository} from './apps/api/src/studio/repository.ts';
+import {StudioRepository} from './apps/api/src/studio/repository.ts';
 export default {async fetch(request,env,ctx){
  const path=new URL(request.url).pathname;
  if(path===${JSON.stringify('/__local_qa_'+qaSecret+'/diagnose')}){
-  const pool=createStudioDatabase(env.STUDIO_DATABASE_URL);
-  try{await new StudioRepository(pool).ready({orgId:'appneural',issuer:'techlyup-learner',accountId:'diagnostic'});return Response.json({ready:true});}
-  catch(error){return Response.json({error:{name:error.name,code:error.code,message:String(error.message).replaceAll(env.STUDIO_DATABASE_URL,'[private-connection]')}});}
-  finally{await pool.end();}
+  try{await new StudioRepository(env.STUDIO_DB).ready();return Response.json({ready:true});}
+  catch(error){return Response.json({error:{name:error.name,code:error.code}});}
  }
  if(path===${JSON.stringify(teacherPath)}||path===${JSON.stringify(learnerPath)}){
   if(env.APP_ENV!=='test'||new URL(request.url).hostname!=='127.0.0.1')return new Response(null,{status:404});
@@ -110,10 +92,16 @@ export default {async fetch(request,env,ctx){
 `;
  const central=(await build({...buildOptions,stdin:{contents:wrapper,resolveDir:backend,sourcefile:'studio-local-qa.ts'}})).outputFiles[0].text;
  const workerScripts=await Promise.all(ids.map(async id=>({id,script:(await build({...buildOptions,entryPoints:[join(frontend,'apps',id,'server/worker.ts')],absWorkingDir:frontend})).outputFiles[0].text})));
- const workers=[{name:'studio-canonical',modules:true,script:central,compatibilityDate:'2026-10-13',compatibilityFlags:['nodejs_compat'],unsafeDirectSockets:[{host:'127.0.0.1',port:8788}],d1Databases:{REGISTRATIONS_DB:'studio-qa-only'},bindings:{APP_ENV:'test',APP_ENABLED:'true',APP_SIGNUP_ENABLED:'true',APP_PRODUCTS_ENABLED:'true',APP_PRODUCTS_APP_ORIGIN:appOrigin,APP_PRODUCTS_LOCAL_ORIGINS:JSON.stringify(localOrigins),APP_ANALYTICS_ENABLED:'false',APP_LEARNING_ENABLED:'false',APP_CRM_ENABLED:'false',TECHLYUP_ERP_ORG_ID:'appneural',APP_ALLOWED_ORIGINS:appOrigin,STUDIO_DATABASE_URL:runtimeUrl.href},serviceBindings:{ASSETS:assetsFor(join(frontend,'apps/mobile/dist'),false)}},...workerScripts.map(({id,script},index)=>({name:`studio-${id}`,modules:true,script,compatibilityDate:'2026-10-13',compatibilityFlags:['nodejs_compat'],unsafeDirectSockets:[{host:'127.0.0.1',port:18921+index}],bindings:{APP_ENV:'test',PRODUCT_ENABLED:'true'},serviceBindings:{ASSETS:assetsFor(join(frontend,'apps',id,'dist/client'),true),TECHLYUP_PRODUCTS:{name:'studio-canonical',entrypoint:'TechlyUpProducts',props:{clientId:`techlyup-${id}`,product:'techlyup',tenantId:'appneural'}}}}))];
+ const studioBindings=Object.fromEntries(ids.map(id=>['STUDIO_'+id.toUpperCase(),{name:`studio-${id}`}]));
+ const workers=[{name:'studio-canonical',modules:true,script:central,compatibilityDate:'2026-10-13',compatibilityFlags:['nodejs_compat'],unsafeDirectSockets:[{host:'127.0.0.1',port:8788}],d1Databases:{REGISTRATIONS_DB:'studio-qa-only',STUDIO_DB:'studio-drafts-qa-only'},bindings:{APP_ENV:'test',APP_ENABLED:'true',APP_SIGNUP_ENABLED:'true',APP_PRODUCTS_ENABLED:'true',APP_PRODUCTS_APP_ORIGIN:appOrigin,APP_ANALYTICS_ENABLED:'false',APP_LEARNING_ENABLED:'false',APP_CRM_ENABLED:'false',TECHLYUP_ERP_ORG_ID:'appneural',APP_ALLOWED_ORIGINS:appOrigin},serviceBindings:{ASSETS:assetsFor(join(frontend,'apps/mobile/dist'),false),...studioBindings}},...workerScripts.map(({id,script})=>({name:`studio-${id}`,modules:true,script,compatibilityDate:'2026-10-13',compatibilityFlags:['nodejs_compat'],bindings:{APP_ENV:'test',PRODUCT_ENABLED:'true'},serviceBindings:{ASSETS:assetsFor(join(frontend,'apps',id,'dist/client'),true),TECHLYUP_PRODUCTS:{name:'studio-canonical',entrypoint:'TechlyUpProducts',props:{clientId:`techlyup-${id}`,product:'techlyup',tenantId:'appneural'}}}}))];
  mf=new Miniflare(convertV4MiniflareOptions({host:'127.0.0.1',port:0,log:new Log(LogLevel.ERROR),workers}));
  ownShutdownSignals();
  await mf.ready;
+ const studio=await mf.getD1Database('STUDIO_DB','studio-canonical'),studioSchema=new DatabaseSync(':memory:');
+ try{
+  studioSchema.exec(await readFile(join(backend,'migrations/studio/0001_studio_workspace.sql'),'utf8'));
+  for(const object of studioSchema.prepare("SELECT sql FROM sqlite_master WHERE sql IS NOT NULL AND name NOT LIKE 'sqlite_%' ORDER BY CASE type WHEN 'table' THEN 0 WHEN 'index' THEN 1 ELSE 2 END,rowid").all())await studio.prepare(object.sql).run();
+ }finally{studioSchema.close();}
  const db=await mf.getD1Database('REGISTRATIONS_DB','studio-canonical'),schema=new DatabaseSync(':memory:');
  try{
   schema.exec(await readFile(join(backend,'apps/api/tests/fixtures/canonical.sql'),'utf8'));
@@ -128,10 +116,10 @@ export default {async fetch(request,env,ctx){
  if(!healthResponse.headers.get('content-type')?.includes('application/json'))throw new Error('private_fixture_health_nonjson_'+healthResponse.status);
  const health=await healthResponse.json();
  if(health.data?.status!=='ready')throw new Error('private_fixture_health_failed');
- await writeFile(join(output,'runtime-status.json'),JSON.stringify({ready:true,appOrigin,productOrigins:localOrigins,qaTeacherUrl:appOrigin+teacherPath,qaLearnerUrl:appOrigin+learnerPath,diagnosticUrl:appOrigin+'/__local_qa_'+qaSecret+'/diagnose',pid:process.pid,startedAt:new Date().toISOString(),storage:'disposable-restricted-local-postgresql',storageDirectory:temporary,d1:'isolated-miniflare'},null,2),{mode:0o600});
- process.stdout.write('Local Studio runtime ready: central 8788, eight apps 18921-18928; private fixture URLs saved in runtime-status.json.\n');
+ await writeFile(join(output,'runtime-status.json'),JSON.stringify({ready:true,appOrigin,productUrls,qaTeacherUrl:appOrigin+teacherPath,qaLearnerUrl:appOrigin+learnerPath,diagnosticUrl:appOrigin+'/__local_qa_'+qaSecret+'/diagnose',pid:process.pid,startedAt:new Date().toISOString(),storage:'isolated-miniflare-d1',storageDirectory:temporary,d1:'isolated-miniflare'},null,2),{mode:0o600});
+ process.stdout.write('Local Studio runtime ready: central 8788 with eight apps at /studio/<app>; private fixture URLs saved in runtime-status.json.\n');
  await new Promise(()=>{});
 }catch(error){
- process.stderr.write('Local Studio runtime could not start: '+(error?.code||error?.message||'sanitized_failure').replace(/postgres(?:ql)?:\/\/\S+/g,'[private-connection]')+'\n');
+ process.stderr.write('Local Studio runtime could not start: '+(error?.code||error?.message||'sanitized_failure')+'\n');
  await cleanup();process.exit(1);
 }
